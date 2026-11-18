@@ -3,7 +3,7 @@
 A **World of Warcraft: Forever** addon that spots party and raid members casting an outdated spell rank, and lets them know.
 
 > **Game Version:** WoW: Forever — Interface 16001 (patch 1.60.x)
-> **Addon Version:** 1.0.3
+> **Addon Version:** 1.1.0
 > **SavedVariables:** `RankWardenDB`
 > **Author:** Sandy Klawz — EU PvE
 
@@ -71,6 +71,17 @@ Buddy (40)  2                        [ Whisper ]
 - The window remembers its size and position.
 - **Minimap button**: left-click toggles the window, right-click turns detection on or off, drag to move it.
 
+### Diagnostics (`/rw diag`)
+
+Opens a plain-text report, already selected, so you can press **Ctrl+C** and paste it anywhere (a bug report, Discord, an AI assistant). It's also on the **Diagnostics** button in the main window. The report covers:
+
+- Client version, build and interface, plus RankWarden's settings and ignore counts.
+- Casts seen this session (yours, your group's, hidden), and **which addon restrictions were active** (Combat, Encounter, ChallengeMode, PvPMatch, Map, Chat) whenever a group member's cast was hidden or got through. This shows exactly when Forever hides other players' casts.
+- A **secrecy census**: how many tracked spells Forever marks `NeverSecret`, `AlwaysSecret` or `ContextuallySecret` as casts (`C_Secrets.GetSpellCastSecrecy`).
+- Addon chat state, group, lead, the last 10 detections and the last 25 group casts with their restrictions.
+
+**Reset counters** starts a fresh measurement; **Refresh** updates the report.
+
 ### How it works on Forever
 
 Forever's client runs on the modern (Midnight-era) addon API:
@@ -79,7 +90,7 @@ Forever's client runs on the modern (Midnight-era) addon API:
 |---|---|---|
 | `COMBAT_LOG_EVENT_UNFILTERED` | never fires for addons | `UNIT_SPELLCAST_SUCCEEDED` on `player`, `party1-4`, `raid1-40` (de-duplicated by cast GUID) |
 | `GetSpellInfo`, `GetSpellLink`, `GetSpellSubtext` | removed | `C_Spell.*` |
-| plain values | spell casts, names and GUIDs can be **secret** during encounters and PvP | secret values are skipped (`issecretvalue`); `/rw status` counts them |
+| plain values | other players' casts, names and GUIDs become **secret** while an addon restriction is active (combat, encounters, PvP, restricted maps) | secret values are skipped (`issecretvalue`); `/rw diag` shows which restriction hid them |
 | chat always allowed | chat messaging **lockdown** in instances; some realms block addon chat | whispers queue during lockdown, or fall back to local chat |
 | realm names | `First Surname` names, no realms | peers are keyed by first name |
 | destination of a spell | no combat log | the caster's target level is used to spot deliberate downranks |
@@ -115,6 +126,7 @@ Whispers are **off** until you enable them. To try it:
 | `/rw help` | List commands |
 | `/rw hud` | Toggle the lower-ranks HUD |
 | `/rw hudlock` / `/rw hudreset` | Lock the HUD in place / move it back to its default spot |
+| `/rw diag` | Open the diagnostics report (pre-selected, Ctrl+C to copy) |
 | `/rw watch` | Toggle the cast monitor (one line per group member whose casts get through; on by default, remembered) |
 | `/rw books` | Toggle book/quest/drop rank notices |
 | `/rw minimap` | Show or hide the minimap button |
@@ -181,6 +193,7 @@ Re-run it when Forever patches change trainers.
 | `Detector.lua` | `UNIT_SPELLCAST_SUCCEEDED` → notification |
 | `SlashCommands.lua` | `/rw` |
 | `RankWarden_Options.lua` | Options panel |
+| `Diagnostics.lua` | Hidden-cast tracking by restriction, secrecy census, copyable report window |
 | `UI.lua` | Shared colours, icons, and actions (whisper, ignore, reset) |
 | `HUD.lua` | Lower-ranks HUD (grouped by player) |
 | `GUI.lua` | Main window, minimap button |

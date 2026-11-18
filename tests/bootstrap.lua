@@ -139,6 +139,9 @@ FakeWidget.methods = {
         if self.callbacks[name] then self.callbacks[name](self, name, ...) end
     end,
     SelectTab = function(self, value) self:Fire("OnGroupSelected", value) end,
+    SetFocus = function(self) self.focused = true end,
+    HighlightText = function(self) self.highlighted = true end,
+    SetText = function(self, t) self.props.SetText = t end,
     Hide = function(self) self:Fire("OnClose") end,
 }
 W.widgets = {}
@@ -245,6 +248,7 @@ dofile("Sync.lua")
 dofile("Notify.lua")
 dofile("Detector.lua")
 dofile("SlashCommands.lua")
+dofile("Diagnostics.lua")
 dofile("UI.lua")
 dofile("HUD.lua")
 dofile("RankWarden_Options.lua")
@@ -277,6 +281,8 @@ function _G.__freshDB()
     RW.Session.whisperedTo = {}
     RW.Sync.peers = {}
     RW.Detector.ResetStats()
+    RW.Diag.Reset()
+    if RW.Diag.frame then RW.Diag.frame:Hide() end
     if RW.GUI.frame then RW.GUI.Close() end
     RW.HUD.frame = nil
     RW.GUI.minimapButton = nil

@@ -20,6 +20,7 @@ return {
         "^UI$",
         "^RankWarden$",
         "^RankWarden_Options$",
+        "^Diagnostics$",
     },
 
     exclude = {

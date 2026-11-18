@@ -246,6 +246,7 @@ function DRAW.detections(container)
         RW.HUD.Toggle()
         G.Refresh()
     end)
+    Button(bar, "Diagnostics", 0.19, function() RW.Diag.Show() end)
 
     local bar2 = Row(container)
     local channel = AceGUI():Create("Dropdown")

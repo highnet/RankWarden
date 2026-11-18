@@ -282,6 +282,11 @@ COMMANDS = {
         end,
     },
 
+    diag = {
+        desc = "Open the diagnostics report (select-all text you can copy with Ctrl+C).",
+        fn = function() RW.Diag.Show() end,
+    },
+
     watch = {
         desc = "Toggle the cast monitor: one line per group member once their casts get through.",
         fn = function()
@@ -309,6 +314,7 @@ COMMANDS = {
 }
 
 SL.COMMANDS = COMMANDS
+SL.Count = Count
 
 --- Dispatches "/rw <cmd> <arg>".
 function SL.Handle(input)

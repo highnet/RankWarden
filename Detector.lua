@@ -177,6 +177,7 @@ function DT.OnSpellcast(_, unit, castGUID, spellID)
         DT.stats.own = DT.stats.own + 1
     else
         DT.stats.others = DT.stats.others + 1
+        RW.Diag.OnCast(unit, Secret(spellID) or Secret(castGUID))
     end
     Watch(unit, spellID)
 

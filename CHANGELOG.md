@@ -4,6 +4,10 @@ New versions are published to CurseForge automatically when the version in
 `RankWarden.toc` is bumped on `main`; the matching section below becomes the
 release notes.
 
+## 1.1.0
+
+- **Diagnostics report** (`/rw diag`, or the **Diagnostics** button in the main window): a plain-text report, pre-selected so **Ctrl+C** copies it. It shows when Forever hides other players' casts (counts of hidden and visible group casts by which addon restriction was active: Combat, Encounter, ChallengeMode, PvPMatch, Map, Chat), a secrecy census of tracked spells (never / always / contextually secret), client build, settings, addon chat state, recent detections and recent group casts. **Reset counters** starts a fresh measurement.
+
 ## 1.0.3
 
 - **Cast monitor is quiet.** It prints one `[watch] <name>: casts are reaching RankWarden` line per group member, the first time their casts get through, instead of a line for every cast. Casts the game hides from addons (in combat, encounters, some instances, PvP) print nothing, since they can't be checked anyway.
