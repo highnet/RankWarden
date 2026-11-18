@@ -168,8 +168,14 @@ MIT, see [`LICENSE`](LICENSE). Third-party notices are in [`THIRD_PARTY_NOTICES.
 
 ## Credits
 
-- **Sandy Klawz** (EU PvE): author.
-- [RankSentinel](https://github.com/valkyrnstudios/RankSentinel) by SabreValkyrn (MIT, see `LICENSE.RankSentinel`): the original idea, plus the curated list of abilities where a low rank is a mistake (from Gogo's revised ability list).
-- [What's Training?](https://www.curseforge.com/wow/addons/whats-training) by Sveng (MIT): Forever trainer spell data.
-- Forever API research: [ForeverPlusPlus notes](https://github.com/xIGBClutchIx/ForeverPlusPlus/blob/main/docs/forever-api.md) and [forever-addon-kit](https://github.com/Thunderz96/forever-addon-kit).
-- Ace3 libraries.
+- **Sandy Klawz** (EU PvE): author. RankWarden is Copyright (c) 2026 highnet, MIT.
+- **[RankSentinel](https://github.com/valkyrnstudios/RankSentinel)** (MIT, Copyright (c) 2021 Gogo1951, maintained by SabreValkyrn / Valkyrn Studios; see `LICENSE.RankSentinel`): the original idea and the curated list of abilities where a low rank is a mistake. RankSentinel's own credits:
+  - **Gogo**: collaboration and data curation ([Gogo's revised ability list](https://docs.google.com/spreadsheets/d/1jtx1WyfChzACzh0WBWANtrqkRtS3D-zPWqs3eOnyVvY/edit?usp=sharing)).
+  - **Aevala** and **Fathom**: ability data feedback.
+  - **Splendiferus**: testing and feedback.
+  - RankSentinel was itself inspired by **[RankWatch](https://www.curseforge.com/wow/addons/rankwatch)**, and succeeds **GogoWatch** and **SpellSnob**.
+- **[What's Training?](https://www.curseforge.com/wow/addons/whats-training)** by Sveng (MIT): Forever trainer spell data.
+- **Libraries:** [Ace3](https://github.com/WoWUIDev/Ace3) (AceAddon, AceEvent, AceConsole, AceComm, AceDB, AceGUI, AceConfig) by the Ace3 Development Team, [LibStub](https://www.wowace.com/projects/libstub), [CallbackHandler-1.0](https://www.wowace.com/projects/callbackhandler) and [ChatThrottleLib](https://www.wowace.com/projects/chatthrottlelib) (Mikk).
+- **Forever API research:** [ForeverPlusPlus notes](https://github.com/xIGBClutchIx/ForeverPlusPlus/blob/main/docs/forever-api.md) (xIGBClutchIx), [forever-addon-kit](https://github.com/Thunderz96/forever-addon-kit) (Thunderz96), and the [Forever UI source mirror](https://github.com/Gethe/wow-ui-source/tree/forever) (Gethe).
+
+Full license texts and versions are in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

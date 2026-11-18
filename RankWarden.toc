@@ -7,8 +7,8 @@
 ## Category: Combat
 ## SavedVariables: RankWardenDB
 ## X-Curse-Project-ID: 1815098
-## X-Credits: Ability data from RankSentinel (SabreValkyrn, MIT) and Gogo's revised ability list
-## X-Embeds: LibStub, CallbackHandler-1.0, AceAddon-3.0, AceEvent-3.0, AceConsole-3.0, AceComm-3.0, AceDB-3.0, AceGUI-3.0, AceConfig-3.0
+## X-Credits: RankSentinel (Gogo1951, SabreValkyrn; credits Gogo, Aevala, Fathom, Splendiferus; inspired by RankWatch, GogoWatch, SpellSnob), What's Training? (Sveng), Ace3, LibStub, CallbackHandler, ChatThrottleLib
+## X-Embeds: LibStub, CallbackHandler-1.0, AceAddon-3.0, AceEvent-3.0, AceConsole-3.0, AceComm-3.0, ChatThrottleLib, AceDB-3.0, AceGUI-3.0, AceConfig-3.0
 
 # ── Embedded Ace3 libraries ──────────────────────────────────────────────────
 Libs\LibStub\LibStub.lua
