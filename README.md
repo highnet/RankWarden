@@ -3,7 +3,7 @@
 A **World of Warcraft: Forever** addon that spots party and raid members casting an outdated spell rank, and lets them know.
 
 > **Game Version:** WoW: Forever — Interface 16001 (patch 1.60.x)
-> **Addon Version:** 1.0.2
+> **Addon Version:** 1.0.3
 > **SavedVariables:** `RankWardenDB`
 > **Author:** Sandy Klawz — EU PvE
 

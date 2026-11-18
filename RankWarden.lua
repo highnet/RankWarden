@@ -4,7 +4,7 @@
 -- Target: World of Warcraft: Forever (interface 16001, WOW_PROJECT_ID 18).
 -- MUST be the first addon file in the TOC — all other modules reference RW.
 
-local ADDON_VERSION = "1.0.2"
+local ADDON_VERSION = "1.0.3"
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Addon object  (AceAddon calls OnInitialize / OnEnable automatically)

@@ -4,6 +4,11 @@ New versions are published to CurseForge automatically when the version in
 `RankWarden.toc` is bumped on `main`; the matching section below becomes the
 release notes.
 
+## 1.0.3
+
+- **Cast monitor is quiet.** It prints one `[watch] <name>: casts are reaching RankWarden` line per group member, the first time their casts get through, instead of a line for every cast. Casts the game hides from addons (in combat, encounters, some instances, PvP) print nothing, since they can't be checked anyway.
+- The monitor's checkbox, `/rw help` text and the empty Detections tab now describe it that way.
+
 ## 1.0.2
 
 - **Rank shown once.** Forever's spell links already include the rank (`[Lightning Shield (Rank 3)]`), so RankWarden no longer adds a second "R3" / "(Rank 3)" in the HUD, the window, the history, `/rw report` or the whisper text. Plain links still get the rank added, in any client language.
