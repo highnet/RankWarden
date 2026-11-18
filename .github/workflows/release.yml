@@ -1,24 +1,54 @@
-# Publishes to CurseForge (and a GitHub release) when a version tag is pushed:
-#   git tag v1.0.0 && git push origin v1.0.0
-# Needs repository secret CF_API_KEY and "## X-Curse-Project-ID" in RankWarden.toc.
+# Auto-publishes new versions to CurseForge.
+#
+# Bump "## Version" in RankWarden.toc (and ADDON_VERSION in RankWarden.lua), add a
+# "## <version>" section to CHANGELOG.md, and push to main. Once CI passes, this
+# workflow builds the zip, uploads it to CurseForge (game version 1.60.1) and
+# creates the v<version> tag + GitHub release. Pushes that don't change the
+# version do nothing.
+#
+# One-time setup: repository secret CF_API_KEY (a CurseForge API token).
 name: Release
 
 on:
-  push:
-    tags: ["v*"]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch: # re-run by hand, e.g. after adding the secret
+
+concurrency: release
 
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 0
 
-      - name: Package and upload
-        uses: BigWigsMods/packager@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build and upload to CurseForge
+        id: release
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          CF_GAME_VERSION: "1.60.1"
+        run: python tools/release.py
+
+      - name: Tag and create GitHub release
+        if: steps.release.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES: ${{ steps.release.outputs.notes }}
+        run: |
+          printf '%s\n' "$NOTES" > notes.md
+          gh release create "${{ steps.release.outputs.tag }}" "${{ steps.release.outputs.zip }}" \
+            --target "${{ github.event.workflow_run.head_sha || github.sha }}" \
+            --title "RankWarden ${{ steps.release.outputs.version }}" \
+            --notes-file notes.md

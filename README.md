@@ -145,22 +145,21 @@ Re-run it when Forever patches change trainers.
 
 ## Releasing
 
-`.github/workflows/release.yml` packages the addon with the [BigWigs packager](https://github.com/BigWigsMods/packager) and uploads it to CurseForge whenever a `v*` tag is pushed:
+New versions go to CurseForge automatically:
+
+1. Bump `## Version` in `RankWarden.toc` and `ADDON_VERSION` in `RankWarden.lua` (a test checks they match).
+2. Add a `## <version>` section to [`CHANGELOG.md`](CHANGELOG.md); it becomes the release notes.
+3. Push to `main`.
+
+Once CI passes, [`release.yml`](.github/workflows/release.yml) runs [`tools/release.py`](tools/release.py). It builds the zip, uploads it to CurseForge for game version 1.60.1, then tags `v<version>` and creates a GitHub release with the zip attached. Pushes that don't change the version publish nothing.
+
+One-time setup: create a CurseForge API token (CurseForge → your account → API tokens) and save it as a repository secret:
 
 ```bash
-git tag v1.0.0
+gh secret set CF_API_KEY --repo highnet/RankWarden
 ```
 
-```bash
-git push origin v1.0.0
-```
-
-One-time setup:
-- Create the project on CurseForge.
-- Add `## X-Curse-Project-ID: <id>` to `RankWarden.toc`.
-- Add a CurseForge API token as the repository secret `CF_API_KEY`.
-
-`ci.yml` runs StyLua, luacheck and busted on every push.
+`python tools/release.py` with `DRY_RUN=1` builds the zip locally without uploading.
 
 ## License
 
