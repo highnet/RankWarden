@@ -15,7 +15,7 @@ $StagingDir = Join-Path $TempDir $AddonName
 # Copy into staging, excluding .git and export.ps1 from the start
 if (Test-Path $TempDir) { Remove-Item -Recurse -Force $TempDir }
 New-Item -ItemType Directory -Force -Path $StagingDir | Out-Null
-robocopy $Source $StagingDir /E /XD ".git" ".vscode" "tests" /XF "export.ps1" "run.ps1" ".luacheckrc" ".busted" ".luacov" ".stylua.toml" ".styluaignore" ".gitignore" "luacov.stats.out" "luacov.report.out" | Out-Null
+robocopy $Source $StagingDir /E /XD ".git" ".github" ".vscode" "tests" "tools" /XF "export.ps1" "run.ps1" ".luacheckrc" ".busted" ".luacov" ".stylua.toml" ".styluaignore" ".gitignore" ".pkgmeta" "luacov.stats.out" "luacov.report.out" | Out-Null
 
 # Zip the named folder so the archive contains RankWarden/ at the root
 if (Test-Path $ZipPath) { Remove-Item -Force $ZipPath }

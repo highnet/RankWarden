@@ -80,5 +80,7 @@ exclude_files = {
     "Libs/**",
     "tests/**",
     "AbilityData.lua", -- generated data table
-    "tools/**",        -- vendored source data
+    "tools/**",
+    ".luarocks/**",    -- CI installs tools into the workspace
+    ".lua/**",        -- vendored source data
 }
