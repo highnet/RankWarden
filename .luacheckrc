@@ -70,6 +70,7 @@ read_globals = {
 
     "debugstack",
     "print",
+    "unpack",
 }
 
 ignore = {

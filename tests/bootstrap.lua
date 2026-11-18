@@ -37,6 +37,7 @@ function _G.__resetWorld()
 end
 _G.__resetWorld()
 
+_G.unpack = _G.unpack or table.unpack -- WoW (Lua 5.1) global; Lua 5.2+ moved it
 _G.debugstack = function() return "stub stacktrace\nline 2\nline 3" end
 _G.print = function(msg) table.insert(W.printed, tostring(msg)) end
 _G.SendChatMessage = function(msg, ch, _, target) table.insert(W.sent, { msg = msg, ch = ch, target = target }) end

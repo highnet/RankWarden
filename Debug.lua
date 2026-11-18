@@ -39,7 +39,9 @@ function D.SafeCall(fn, ...)
         print(ERR_PREFIX .. " SafeCall: expected function, got " .. type(fn))
         return false, nil
     end
-    return xpcall(fn, OnError, ...)
+    -- Plain Lua 5.1's xpcall takes no extra arguments, so close over them.
+    local n, args = select("#", ...), { ... }
+    return xpcall(function() return fn(unpack(args, 1, n)) end, OnError)
 end
 
 --- Prints only while /rw debug is on.
