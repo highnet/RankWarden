@@ -215,8 +215,10 @@ describe("SlashCommands", function()
         run("allow 145")
         assert.is_true(RW.Session.ignoredSpells[145])
         assert.is_nil(RW.db.profile.ignoredSpells)
-        RW.UI.Reset() -- the HUD's Reset keeps session ignores
+        RW.Session.whisperedTo["Buddy|1"] = true
+        RW.UI.Reset() -- the HUD's Reset keeps session ignores and who was whispered
         assert.is_true(RW.Session.ignoredSpells[145])
+        assert.is_true(RW.Session.whisperedTo["Buddy|1"])
     end)
 
     it("allow toggles a spell from a link", function()

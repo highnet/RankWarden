@@ -202,7 +202,9 @@ local function PlayerList(scroll, report)
             0.52
         )
         if p.name ~= me then
-            Button(head, whispered and "Whisper again" or "Whisper", 0.22, function() U.WhisperPlayer(p.name) end)
+            local unsent = U.HasUnsentWhisper(p)
+            local w = Button(head, unsent and "Whisper" or "Whispered", 0.22, function() U.WhisperPlayer(p.name) end)
+            w:SetDisabled(not unsent)
             Button(head, "Ignore player", 0.22, function() U.IgnorePlayer(p.name, p.guid) end)
         end
         for _, rec in ipairs(p.entries) do
@@ -334,6 +336,21 @@ function DRAW.ignored(container)
         end)
     end
     if not any then Label(scroll, "|cff888888None.|r") end
+
+    Heading(scroll, "Ignored for one player (this session only)")
+    local anyPlayerSpell = false
+    for key, info in pairs(RW.Session.ignoredPlayerSpells) do
+        anyPlayerSpell = true
+        local row = Row(scroll)
+        Label(row, ("%s — %s"):format(tostring(info.name), tostring(info.spell)), 0.75)
+        Button(row, "Remove", 0.2, function()
+            RW.Session.ignoredPlayerSpells[key] = nil
+            G.Refresh()
+        end)
+    end
+    if not anyPlayerSpell then
+        Label(scroll, "|cff888888None. Right-click a spell in the HUD, or use Ignore spell on the Detections tab.|r")
+    end
 
     Heading(scroll, "Commonly downranked spells")
     local master = Row(scroll)

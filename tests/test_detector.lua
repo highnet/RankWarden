@@ -124,6 +124,32 @@ describe("Detector", function()
             assert.is_nil(evaluate(800002, nil, nil, 60))
         end)
 
+        it("per-player ignores only skip that player", function()
+            RW.Session.ignoredPlayerSpells[RW.Session.PlayerSpellKey(BUDDY, 145)] = { name = "Buddy" }
+            assert.is_nil(evaluate(145))
+            assert.is_table(evaluate(145, "Player-1-ZED", "Zed"))
+        end)
+
+        it("never auto-whispers the same player about the same spell twice", function()
+            RW.db.profile.whisper = true
+            RW.db.profile.debug = true -- debug re-alerts, so the session guard is what stops it
+            assert.is_true(evaluate(145).isWhisper)
+            local second = evaluate(145)
+            assert.is_false(second.isWhisper)
+            assert.are.equal(1, #W.sent)
+        end)
+
+        it("auto-whisper and the manual button share the once-per-session rule", function()
+            evaluate(145)
+            RW.UI.WhisperPlayer("Buddy")
+            assert.are.equal(1, #W.sent)
+            RW.db.profile.whisper = true
+            RW.db.profile.debug = true
+            assert.is_false(evaluate(145).isWhisper)
+            assert.are.equal(1, #W.sent)
+            assert.is_false(RW.UI.HasUnsentWhisper(RW.UI.GroupByPlayer(RW.Session.report)[1]))
+        end)
+
         it("records detections for the report", function()
             evaluate(145)
             assert.are.equal(1, #RW.Session.report)

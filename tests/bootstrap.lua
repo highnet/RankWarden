@@ -244,6 +244,8 @@ function _G.__freshDB()
     RW.db.ResetProfile = function(self) self.profile = deepcopy(RW.DB_DEFAULTS.profile) end
     RW.Session.Reset()
     RW.Session.ignoredSpells = {}
+    RW.Session.ignoredPlayerSpells = {}
+    RW.Session.whisperedTo = {}
     RW.Sync.peers = {}
     RW.Detector.ResetStats()
     RW.Detector.watch = false

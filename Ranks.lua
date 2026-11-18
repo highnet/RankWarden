@@ -214,7 +214,8 @@ end
 
 --- True when the profile says to skip this ability (common downrank or user-ignored).
 --- @param profile table  RW.db.profile
-function R.IsIgnoredSpell(spellID, profile)
+--- @param player string|nil  caster GUID or name, for per-player ignores
+function R.IsIgnoredSpell(spellID, profile, player)
     if profile.ignoreCommonDownranks then
         for _, entry in ipairs(R.COMMON_DOWNRANKS) do
             if profile.commonDownranks[entry.id] ~= false and R.SameAbility(spellID, entry.id) then return true end
@@ -223,6 +224,7 @@ function R.IsIgnoredSpell(spellID, profile)
     for id in pairs(RW.Session.ignoredSpells) do
         if R.SameAbility(spellID, id) then return true end
     end
+    if player and RW.Session.ignoredPlayerSpells[RW.Session.PlayerSpellKey(player, spellID)] then return true end
     return false
 end
 

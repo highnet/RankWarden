@@ -129,19 +129,26 @@ function U.WhisperPlayer(name)
         if p.name == name then
             for _, rec in ipairs(p.entries) do
                 if sent >= U.MAX_WHISPERS_PER_PLAYER then break end
-                local fields = { spell = rec.spell, rank = rec.rank, level = rec.nextLevel, name = name }
-                RW.Notify.Enqueue({
-                    target = name,
-                    isWhisper = true,
-                    ability = ("%s (Rank %d)"):format(tostring(rec.spell), rec.rank or 0),
-                    message = RW.Messages.Build(rec.book and "WhisperBook" or "Whisper", fields, profile.flavor),
-                })
+                local key = RW.Session.PlayerSpellKey(name, rec.spellID)
+                -- Each player hears about each spell at most once per session.
+                if not RW.Session.whisperedTo[key] then
+                    RW.Session.whisperedTo[key] = true
+                    local fields = { spell = rec.spell, rank = rec.rank, level = rec.nextLevel, name = name }
+                    RW.Notify.Enqueue({
+                        target = name,
+                        isWhisper = true,
+                        ability = ("%s (Rank %d)"):format(tostring(rec.spell), rec.rank or 0),
+                        message = RW.Messages.Build(rec.book and "WhisperBook" or "Whisper", fields, profile.flavor),
+                    })
+                    sent = sent + 1
+                end
                 rec.whispered = true
-                sent = sent + 1
             end
         end
     end
-    if sent > 0 then
+    if sent == 0 then
+        RW.Chat.Print(("Already whispered %s about these this session."):format(name))
+    else
         local blocked = RW.Chat.ChatBlocked()
         RW.Chat.Print(
             ("Whispering %s (%d)%s."):format(name, sent, blocked and " — queued until chat is allowed" or "")
@@ -162,16 +169,33 @@ function U.WhisperAll()
     return total
 end
 
---- Ignore every rank of a detection's spell for this login session and drop it from the list.
+--- True when this player still has a lower rank they haven't been whispered about.
+function U.HasUnsentWhisper(player)
+    for _, rec in ipairs(player.entries) do
+        if not RW.Session.whisperedTo[RW.Session.PlayerSpellKey(player.name, rec.spellID)] then return true end
+    end
+    return false
+end
+
+--- Ignore one player's spell (every rank) for this login session, and drop it from the list.
+--- Other players casting the same spell are still reported.
 function U.IgnoreSpell(rec)
     if not rec.spellID then return end
-    RW.Session.ignoredSpells[rec.spellID] = true
+    local player = rec.guid or rec.name
+    RW.Session.ignoredPlayerSpells[RW.Session.PlayerSpellKey(player, rec.spellID)] = {
+        name = rec.name,
+        spell = rec.spell,
+        spellID = rec.spellID,
+    }
     local kept = {}
     for _, r in ipairs(RW.Session.report) do
-        if not RW.Ranks.SameAbility(r.spellID or -1, rec.spellID) then kept[#kept + 1] = r end
+        local same = (r.guid or r.name) == player and RW.Ranks.SameAbility(r.spellID or -1, rec.spellID)
+        if not same then kept[#kept + 1] = r end
     end
     RW.Session.report = kept
-    RW.Chat.Print("Ignoring every rank of " .. tostring(rec.spell) .. " for this session. Undo in /rw → Ignored.")
+    RW.Chat.Print(
+        ("Ignoring %s for %s this session. Undo in /rw → Ignored."):format(tostring(rec.spell), tostring(rec.name))
+    )
     RefreshAll()
 end
 
@@ -212,7 +236,9 @@ function U.ShowSpellTooltip(owner, rec, anchor)
     end
     GameTooltip:AddLine(" ")
     GameTooltip:AddLine(("Used: Rank %d · %s"):format(rec.rank or 0, U.NextText(rec, true)), 1, 1, 1, true)
-    GameTooltip:AddLine(U.Color("muted", "Shift-click: link in chat · Right-click: ignore this spell (this session)"))
+    GameTooltip:AddLine(
+        U.Color("muted", "Shift-click: link in chat · Right-click: ignore this spell for this player (this session)")
+    )
     GameTooltip:Show()
 end
 

@@ -305,7 +305,10 @@ function H.Refresh()
         b.text:SetText(rows[i].text)
         local canWhisper = rows[i].kind == "player" and rows[i].player.name ~= UnitName("player")
         b.whisper:SetShown(canWhisper)
-        b.whisper:SetText(canWhisper and H.HasWhispered(rows[i].player) and "Again" or "Whisper")
+        -- Each player hears about each spell once per session: "Sent" once nothing is left to say.
+        local unsent = canWhisper and U.HasUnsentWhisper(rows[i].player)
+        b.whisper:SetText(unsent and "Whisper" or "Sent")
+        b.whisper:SetEnabled(unsent and true or false)
         b.text:SetPoint("RIGHT", canWhisper and -62 or -2, 0)
         b:Show()
     end

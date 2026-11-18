@@ -158,7 +158,11 @@ describe("HUD frame", function()
         buddy.whisper.scripts.OnClick(buddy.whisper)
         assert.are.equal(1, #_G.__W.sent)
         assert.are.equal("Buddy", _G.__W.sent[1].target)
-        assert.are.equal("Again", visibleRows()[1].whisper.text)
+        assert.are.equal("Sent", visibleRows()[1].whisper.text)
+        -- a second click sends nothing new
+        local again = visibleRows()[1]
+        again.whisper.scripts.OnClick(again.whisper)
+        assert.are.equal(1, #_G.__W.sent)
     end)
 
     it("player row: a plain click never whispers; right-click ignores", function()
@@ -199,7 +203,8 @@ describe("HUD frame", function()
         spellRow.scripts.OnClick(spellRow, "LeftButton")
         assert.are.equal("[spell145]", _G.__W.linked)
         spellRow.scripts.OnClick(spellRow, "RightButton")
-        assert.is_true(RW.Session.ignoredSpells[145])
+        assert.is_not_nil(RW.Session.ignoredPlayerSpells["Player-1-BUDDY|" .. RW.AbilityData[145].AbilityGroup])
+        assert.is_nil(next(RW.Session.ignoredSpells)) -- not a global ignore
         assert.are.equal(0, #RW.Session.report)
     end)
 

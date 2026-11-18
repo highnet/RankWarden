@@ -20,6 +20,18 @@ S.Reset()
 --- cleared on logout or /reload, and kept across the HUD's Reset.
 S.ignoredSpells = {}
 
+--- Per-player state for this login session (kept across the HUD's Reset):
+---   ignoredPlayerSpells["<player>|<abilityGroup>"] = { name, spell, spellID }  — that player's spell is ignored
+---   whisperedTo["<player>|<abilityGroup>"]        = true  — they were already whispered about it
+S.ignoredPlayerSpells = {}
+S.whisperedTo = {}
+
+--- Key for one player's ability (players are keyed by GUID when known, else name).
+function S.PlayerSpellKey(player, spellID)
+    local data = RW.AbilityData and RW.AbilityData[spellID]
+    return tostring(player) .. "|" .. tostring(data and data.AbilityGroup or spellID)
+end
+
 S.HISTORY_SIZE = 200 -- detections kept across sessions for the History tab
 
 --- Records a detection for /rw report, the session list and the saved history.

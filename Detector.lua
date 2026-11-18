@@ -56,7 +56,7 @@ function DT.Evaluate(spellID, guid, name, casterLevel, targetLevel, class)
     local profile = RW.db.profile
     if not profile.enabled then return nil end
     if not RW.Ranks.Lookup(spellID) then return nil end
-    if RW.Ranks.IsIgnoredSpell(spellID, profile) then return nil end
+    if RW.Ranks.IsIgnoredSpell(spellID, profile, guid) then return nil end
     if not guid or not name or profile.ignored[guid] then return nil end
 
     local maxLevel = RW.Ranks.MaxLevel()
@@ -91,7 +91,12 @@ function DT.Evaluate(spellID, guid, name, casterLevel, targetLevel, class)
     local entry = { target = name, isWhisper = false, ability = ability }
     if isSelf then
         entry.message = RW.Messages.Build("Self" .. suffix, fields, profile.flavor)
-    elseif profile.whisper and RW.Sync.IsLead() then
+    elseif
+        profile.whisper
+        and RW.Sync.IsLead()
+        and not RW.Session.whisperedTo[RW.Session.PlayerSpellKey(name, spellID)]
+    then
+        RW.Session.whisperedTo[RW.Session.PlayerSpellKey(name, spellID)] = true
         entry.isWhisper = true
         entry.message = RW.Messages.Build("Whisper" .. suffix, fields, profile.flavor)
     else
