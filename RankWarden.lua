@@ -29,6 +29,7 @@ RW.DB_DEFAULTS = {
         debug = false,
         announced = {}, -- "guid-level-spellID" → true  (never repeat)
         ignored = {}, -- guid → name
+        watch = true, -- cast monitor: print every group member's cast to chat
         bookRanks = true, -- at max level, mention ranks trainers don't sell (books, quests, drops)
         ignoreCommonDownranks = true, -- skip heals & other spells people downrank on purpose
         commonDownranks = {}, -- rank-1 spellID → false to stop ignoring that one

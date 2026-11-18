@@ -285,11 +285,11 @@ COMMANDS = {
     watch = {
         desc = "Toggle printing every cast from your group (to check other players are seen).",
         fn = function()
-            RW.Detector.watch = not RW.Detector.watch
+            RW.db.profile.watch = not RW.db.profile.watch
             P(
                 "Cast monitor: "
-                    .. OnOff(RW.Detector.watch)
-                    .. (RW.Detector.watch and "  — ask a group member to cast anything." or "")
+                    .. OnOff(RW.db.profile.watch)
+                    .. (RW.db.profile.watch and "  — ask a group member to cast anything." or "")
             )
         end,
     },

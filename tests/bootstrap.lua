@@ -248,7 +248,6 @@ function _G.__freshDB()
     RW.Session.whisperedTo = {}
     RW.Sync.peers = {}
     RW.Detector.ResetStats()
-    RW.Detector.watch = false
     if RW.GUI.frame then RW.GUI.Close() end
     RW.HUD.frame = nil
     RW.GUI.minimapButton = nil

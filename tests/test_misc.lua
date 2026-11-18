@@ -169,8 +169,9 @@ describe("SlashCommands", function()
     end)
 
     it("watch toggles the cast monitor", function()
+        assert.is_true(RW.db.profile.watch) -- on by default
         run("watch")
-        assert.is_true(RW.Detector.watch)
+        assert.is_false(RW.db.profile.watch)
         assert.is_true(printedContains("Cast monitor"))
     end)
 

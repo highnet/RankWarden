@@ -245,7 +245,7 @@ describe("Detector", function()
         end)
 
         it("cast monitor prints other players' casts, tracked or not", function()
-            DT.watch = true
+            RW.db.profile.watch = true
             spellcast("player", 145)
             spellcast("party1", 424242)
             spellcast("party1", 145)
@@ -261,7 +261,7 @@ describe("Detector", function()
         end)
 
         it("cast monitor shows hidden names", function()
-            DT.watch = true
+            RW.db.profile.watch = true
             W.units.party1.name = W.SECRET
             spellcast("party1", 424242)
             assert.is_truthy(W.printed[#W.printed]:find("<hidden>", 1, true))

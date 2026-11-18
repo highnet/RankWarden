@@ -75,7 +75,7 @@ Whispers are **off** until you enable them. To try it:
 | `/rw help` | List commands |
 | `/rw hud` | Toggle the lower-ranks HUD |
 | `/rw hudlock` / `/rw hudreset` | Lock the HUD in place / move it back to its default spot |
-| `/rw watch` | Toggle the cast monitor (prints every group cast) |
+| `/rw watch` | Toggle the cast monitor (prints every group cast; on by default) |
 | `/rw books` | Toggle book/quest/drop rank notices |
 | `/rw minimap` | Show or hide the minimap button |
 | `/rw on` / `/rw off` | Enable / disable detection |

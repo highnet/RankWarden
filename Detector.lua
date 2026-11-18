@@ -144,7 +144,6 @@ local function ReadCaster(unit)
 end
 
 -- Cast monitor (/rw watch): proves whether Forever delivers other players' casts.
-DT.watch = false -- session only, never saved
 DT.stats = { own = 0, others = 0 }
 
 function DT.ResetStats()
@@ -153,7 +152,7 @@ function DT.ResetStats()
 end
 
 local function Watch(unit, spellID)
-    if not DT.watch or unit == "player" then return end
+    if not RW.db.profile.watch or unit == "player" then return end
     local who = UnitName(unit)
     if Secret(who) then who = "<hidden>" end
     local what

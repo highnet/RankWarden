@@ -177,8 +177,8 @@ describe("GUI window", function()
 
     it("cast monitor checkbox toggles watching", function()
         G.Open()
-        find("CheckBox", "Cast monitor"):Fire("OnValueChanged", true)
-        assert.is_true(RW.Detector.watch)
+        find("CheckBox", "Cast monitor"):Fire("OnValueChanged", false)
+        assert.is_false(RW.db.profile.watch)
     end)
 
     it("top checkboxes change settings", function()
