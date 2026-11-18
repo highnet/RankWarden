@@ -106,7 +106,7 @@ O.TABLE = {
             order = 26,
             type = "description",
             width = "full",
-            name = "|cff888888Ignore any other spell with |cffffff00/rw allow|r |cff888888+ shift-click it in your spellbook.|r\n",
+            name = "|cff888888Ignore any other spell with |cffffff00/rw allow|r |cff888888+ shift-click it in your spellbook (lasts until you log out).|r\n",
         },
         hud = {
             order = 27,

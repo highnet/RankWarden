@@ -129,13 +129,13 @@ COMMANDS = {
     },
 
     allow = {
-        desc = "<spell link|id>  Toggle ignoring every rank of a spell. No arg = list.",
+        desc = "<spell link|id>  Toggle ignoring every rank of a spell this session. No arg = list.",
         fn = function(arg, raw)
             if not DBReady() then return end
-            local list = RW.db.profile.ignoredSpells
+            local list = RW.Session.ignoredSpells
             local id = tonumber((raw or arg):match("|Hspell:(%d+)") or (raw or arg):match("^(%d+)$") or "")
             if not id then
-                P("Ignored spells (any rank):")
+                P("Ignored spells this session (any rank):")
                 for sid in pairs(list) do
                     print("  " .. (RW.Ranks.SpellName(sid) or ("spell " .. sid)) .. " (" .. sid .. ")")
                 end
@@ -149,7 +149,7 @@ COMMANDS = {
                 P("Watching " .. name .. " again.")
             else
                 list[id] = true
-                P("Ignoring every rank of " .. name .. ".")
+                P("Ignoring every rank of " .. name .. " for this session.")
             end
         end,
     },
@@ -204,7 +204,7 @@ COMMANDS = {
                     RW.Sync.Lead(),
                     Count(p.announced),
                     Count(p.ignored),
-                    Count(p.ignoredSpells),
+                    Count(RW.Session.ignoredSpells),
                     #RW.Session.queue
                 )
             )

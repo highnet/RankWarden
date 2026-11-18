@@ -162,16 +162,16 @@ function U.WhisperAll()
     return total
 end
 
---- Ignore every rank of a detection's spell and drop it from the list.
+--- Ignore every rank of a detection's spell for this login session and drop it from the list.
 function U.IgnoreSpell(rec)
     if not rec.spellID then return end
-    RW.db.profile.ignoredSpells[rec.spellID] = true
+    RW.Session.ignoredSpells[rec.spellID] = true
     local kept = {}
     for _, r in ipairs(RW.Session.report) do
         if not RW.Ranks.SameAbility(r.spellID or -1, rec.spellID) then kept[#kept + 1] = r end
     end
     RW.Session.report = kept
-    RW.Chat.Print("Ignoring every rank of " .. tostring(rec.spell) .. ". Undo in /rw → Ignored.")
+    RW.Chat.Print("Ignoring every rank of " .. tostring(rec.spell) .. " for this session. Undo in /rw → Ignored.")
     RefreshAll()
 end
 
@@ -212,7 +212,7 @@ function U.ShowSpellTooltip(owner, rec, anchor)
     end
     GameTooltip:AddLine(" ")
     GameTooltip:AddLine(("Used: Rank %d · %s"):format(rec.rank or 0, U.NextText(rec, true)), 1, 1, 1, true)
-    GameTooltip:AddLine(U.Color("muted", "Shift-click: link in chat · Right-click: ignore this spell"))
+    GameTooltip:AddLine(U.Color("muted", "Shift-click: link in chat · Right-click: ignore this spell (this session)"))
     GameTooltip:Show()
 end
 
@@ -221,7 +221,7 @@ function U.ShowPlayerTooltip(owner, player, anchor)
     GameTooltip:SetOwner(owner, anchor or "ANCHOR_RIGHT")
     GameTooltip:AddLine(U.ClassName(player.name, player.class))
     GameTooltip:AddLine(("%d lower %s"):format(#player.entries, #player.entries == 1 and "rank" or "ranks"), 1, 1, 1)
-    GameTooltip:AddLine(U.Color("muted", "Click: whisper them now · Right-click: ignore player"))
+    GameTooltip:AddLine(U.Color("muted", "Whisper button: whisper them now · Right-click: ignore player"))
     GameTooltip:Show()
 end
 

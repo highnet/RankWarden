@@ -1,10 +1,11 @@
 -- HUD.lua
 -- Compact, movable on-screen list of lower ranks this session, grouped by player.
 --   Header:  icon · "Lower ranks N" · [–/+ collapse] [window] [x]
---   Player rows (class coloured): click = whisper now, right-click = ignore player
+--   Player rows (class coloured): [Whisper] button = whisper that player now,
+--                                 right-click = ignore player
 --   Spell rows (icon + rank + next): hover = spell tooltip, shift-click = link,
 --                                    right-click = ignore spell
---   Footer:  [Whisper all] [Reset] · "2 players · 3 lower ranks"
+--   Footer:  [Reset] · "2 players · 3 lower ranks"
 -- Pops open on new detections (optional). /rw hud · /rw hudlock · /rw hudreset
 -- Depends on: RankWarden.lua (Core), Session.lua, UI.lua, Chat.lua
 
@@ -42,12 +43,16 @@ end
 --- Text of one player row.
 function H.FormatPlayer(p)
     local level = p.level and (" " .. U.Color("muted", "(" .. p.level .. ")")) or ""
-    local whispered = false
-    for _, rec in ipairs(p.entries) do
-        if rec.whispered then whispered = true end
-    end
-    local mark = whispered and ("  " .. U.Color("muted", "whispered")) or ""
+    local mark = H.HasWhispered(p) and ("  " .. U.Color("muted", "whispered")) or ""
     return ("%s%s  %s%s"):format(U.ClassName(p.name, p.class), level, U.Color("count", #p.entries), mark)
+end
+
+--- True when this player has been whispered this session.
+function H.HasWhispered(p)
+    for _, rec in ipairs(p.entries) do
+        if rec.whispered then return true end
+    end
+    return false
 end
 
 --- Rows for the HUD: { kind = "player"|"spell"|"more"|"empty", text, player, rec }.
@@ -193,15 +198,6 @@ function H.Create()
     f.collapseButton:SetPoint("RIGHT", f.windowButton, "LEFT", -3, 0)
 
     -- Footer
-    f.whisperAll = TextButton(
-        f,
-        "Whisper all",
-        92,
-        "Whisper everyone listed about their lower ranks now.",
-        function() U.WhisperAll() end
-    )
-    f.whisperAll:SetPoint("BOTTOMLEFT", H.PADDING, H.PADDING - 1)
-
     f.reset = TextButton(
         f,
         "Reset",
@@ -209,7 +205,7 @@ function H.Create()
         "Clear the list and forget who was notified, so new casts show again.",
         function() U.Reset() end
     )
-    f.reset:SetPoint("LEFT", f.whisperAll, "RIGHT", 4, 0)
+    f.reset:SetPoint("BOTTOMLEFT", H.PADDING, H.PADDING - 1)
 
     f.summary = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     f.summary:SetPoint("BOTTOMRIGHT", -H.PADDING - 2, H.PADDING + 3)
@@ -243,11 +239,8 @@ local function OnRowClick(self, button)
             U.LinkSpell(row.rec)
         end
     elseif row.kind == "player" then
-        if button == "RightButton" then
-            U.IgnorePlayer(row.player.name, row.player.guid)
-        else
-            U.WhisperPlayer(row.player.name)
-        end
+        -- Whispering is only ever the row's own button, never a stray click.
+        if button == "RightButton" then U.IgnorePlayer(row.player.name, row.player.guid) end
     elseif row.kind == "more" then
         RW.GUI.Open()
     end
@@ -270,6 +263,22 @@ local function RowButton(f, i)
         b:SetScript("OnEnter", OnRowEnter)
         b:SetScript("OnLeave", U.HideTooltip)
         b:SetScript("OnClick", OnRowClick)
+
+        -- Per-player whisper button (shown on player rows only).
+        local w = CreateFrame("Button", nil, b, "UIPanelButtonTemplate")
+        w:SetSize(58, 14)
+        w:SetPoint("RIGHT", b, "RIGHT", 0, 0)
+        w:SetText("Whisper")
+        w:SetScript("OnClick", function(self)
+            local row = self:GetParent().row
+            if row and row.player then U.WhisperPlayer(row.player.name) end
+        end)
+        w:SetScript("OnEnter", function(self)
+            local row = self:GetParent().row
+            if row and row.player then Hint(self, "Whisper " .. row.player.name .. " about their lower ranks now.") end
+        end)
+        w:SetScript("OnLeave", U.HideTooltip)
+        b.whisper = w
         f.rows[i] = b
     end
     return b
@@ -294,6 +303,10 @@ function H.Refresh()
         local b = RowButton(f, i)
         b.row = rows[i]
         b.text:SetText(rows[i].text)
+        local canWhisper = rows[i].kind == "player" and rows[i].player.name ~= UnitName("player")
+        b.whisper:SetShown(canWhisper)
+        b.whisper:SetText(canWhisper and H.HasWhispered(rows[i].player) and "Again" or "Whisper")
+        b.text:SetPoint("RIGHT", canWhisper and -62 or -2, 0)
         b:Show()
     end
     for i = shown + 1, #f.rows do
@@ -302,7 +315,6 @@ function H.Refresh()
     end
 
     local hasPlayers = total > 0
-    f.whisperAll:SetShown(not collapsed and hasPlayers)
     f.reset:SetShown(not collapsed and hasPlayers)
     f.summary:SetShown(not collapsed)
 

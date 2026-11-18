@@ -32,7 +32,6 @@ RW.DB_DEFAULTS = {
         bookRanks = true, -- at max level, mention ranks trainers don't sell (books, quests, drops)
         ignoreCommonDownranks = true, -- skip heals & other spells people downrank on purpose
         commonDownranks = {}, -- rank-1 spellID → false to stop ignoring that one
-        ignoredSpells = {}, -- spellID → true (any rank of that ability is skipped)
         history = {}, -- recent detections (Session.HISTORY_SIZE), newest last
         minimap = { hide = false, angle = 200 }, -- minimap button
         hud = {
@@ -52,6 +51,7 @@ RW.DB_DEFAULTS = {
 -- ─────────────────────────────────────────────────────────────────────────────
 function RW:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("RankWardenDB", RW.DB_DEFAULTS, true)
+    self.db.profile.ignoredSpells = nil -- older versions saved this; ignores are per session now
 
     RW.BuildRanks()
 

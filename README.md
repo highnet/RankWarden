@@ -16,7 +16,7 @@ Inspired by [RankSentinel](https://www.curseforge.com/wow/addons/ranksentinel) (
 - Watches **you, your party and your raid** for low-rank casts.
 - Knows **Forever's own trainer data**, including Forever's new abilities and new ranks (1,493 trainable spells, 162 of them new in Forever).
 - **Local only by default.** Notifications appear only in your chat frame until you turn whispers on with `/rw whisper`.
-- **Ignores commonly downranked spells** (heals, Power Word: Shield, Frostbolt, Earth Shock, Moonfire, Arcane Explosion, ...). Each can be switched on or off, and you can ignore any other spell with `/rw allow`.
+- **Ignores commonly downranked spells** (heals, Power Word: Shield, Frostbolt, Earth Shock, Moonfire, Arcane Explosion, ...). Each can be switched on or off, and you can ignore any other spell for the rest of your session with `/rw allow` (cleared when you log out or `/reload`).
 - Gives players a few levels to visit their trainer before it says anything. It never repeats itself, and it skips casts on much lower targets (deliberate downranks).
 - Whispers wait until neither of you is in combat. During Forever's chat lockdown in dungeons and raids they also wait until you leave.
 - When several group members run RankWarden, only one of them (the "lead") whispers.
@@ -24,8 +24,8 @@ Inspired by [RankSentinel](https://www.curseforge.com/wow/addons/ranksentinel) (
 - **Window** (`/rw` toggles it) with tabs for this session's detections, saved history, ignored spells and players, and settings. Detections are grouped by player, with **Whisper**, **Ignore player** and **Ignore spell** buttons on each row. It also has **Whisper all**, **Reset**, a report-to-channel picker, and a remembered window size and position. There's also a **minimap button**: left-click toggles the window, right-click turns detection on or off, drag to move it.
 - **Lower-ranks HUD** (`/rw hud`): a small, movable panel listing this session's lower ranks, grouped by player.
   - Player names are in class colours, with their level and count. Each spell has its icon, rank, and where the next rank comes from. Fresh detections are marked **new**.
-  - Click a player to **whisper them now**, or right-click to ignore them. Hover a spell for its tooltip, shift-click to link it, or right-click to ignore it.
-  - Footer buttons: **Whisper all** and **Reset**, which clears the list and forgets who was notified.
+  - Each player row has its own **Whisper** button (a plain click never whispers). Right-click a player to ignore them. Hover a spell for its tooltip, shift-click to link it, or right-click to ignore it for this session.
+  - Footer button: **Reset**, which clears the list and forgets who was notified.
   - It pops open on new detections (optional), collapses to its title bar, and can be locked and scaled. It remembers its position.
 - **Cast monitor** (`/rw watch`) prints every cast from your group, so you can check that other players' casts reach the addon.
 - Options panel under **Options → AddOns → RankWarden**.
@@ -81,7 +81,7 @@ Whispers are **off** until you enable them. To try it:
 | `/rw on` / `/rw off` | Enable / disable detection |
 | `/rw whisper` | Toggle whispering players (off = local only) |
 | `/rw downrank` | Toggle ignoring commonly downranked spells, and list them |
-| `/rw allow <spell>` | Toggle ignoring every rank of a spell (shift-click it) |
+| `/rw allow <spell>` | Toggle ignoring every rank of a spell for this session (shift-click it) |
 | `/rw maxlevel` | Only check max-level casters |
 | `/rw flavor [name]` | List or set the wording (`default`, `short`, `friendly`) |
 | `/rw ignore` | Toggle ignoring your current target |

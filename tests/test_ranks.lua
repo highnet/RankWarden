@@ -179,7 +179,7 @@ describe("Ranks", function()
         end)
 
         it("ignores every rank of a user-ignored spell", function()
-            RW.db.profile.ignoredSpells[3140] = true
+            RW.Session.ignoredSpells[3140] = true
             assert.is_true(R.IsIgnoredSpell(133, RW.db.profile))
         end)
 

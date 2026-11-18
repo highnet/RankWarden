@@ -220,7 +220,7 @@ function R.IsIgnoredSpell(spellID, profile)
             if profile.commonDownranks[entry.id] ~= false and R.SameAbility(spellID, entry.id) then return true end
         end
     end
-    for id in pairs(profile.ignoredSpells) do
+    for id in pairs(RW.Session.ignoredSpells) do
         if R.SameAbility(spellID, id) then return true end
     end
     return false

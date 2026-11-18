@@ -306,15 +306,15 @@ function DRAW.ignored(container)
     local scroll = Scroll(container)
     local p = RW.db.profile
 
-    Heading(scroll, "Ignored spells (every rank)")
+    Heading(scroll, "Ignored spells (every rank, this session only)")
     local add = AceGUI():Create("EditBox")
     add:SetLabel("Add a spell: shift-click it from your spellbook, or type its ID")
     add:SetFullWidth(true)
     add:SetCallback("OnEnterPressed", function(w, _, text)
         local id = G.ParseSpell(text)
         if id then
-            p.ignoredSpells[id] = true
-            RW.Chat.Print("Ignoring every rank of " .. SpellName(id) .. ".")
+            RW.Session.ignoredSpells[id] = true
+            RW.Chat.Print("Ignoring every rank of " .. SpellName(id) .. " for this session.")
             G.Refresh()
         else
             RW.Chat.Warn("That isn't a spell link or ID.")
@@ -324,12 +324,12 @@ function DRAW.ignored(container)
     scroll:AddChild(add)
 
     local any = false
-    for id in pairs(p.ignoredSpells) do
+    for id in pairs(RW.Session.ignoredSpells) do
         any = true
         local row = Row(scroll)
         Label(row, SpellName(id) .. " |cff888888(" .. id .. ")|r", 0.75)
         Button(row, "Remove", 0.2, function()
-            p.ignoredSpells[id] = nil
+            RW.Session.ignoredSpells[id] = nil
             G.Refresh()
         end)
     end

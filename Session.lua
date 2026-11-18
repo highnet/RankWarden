@@ -16,6 +16,10 @@ end
 
 S.Reset()
 
+--- Spells ignored for this login session only (every rank). Not saved:
+--- cleared on logout or /reload, and kept across the HUD's Reset.
+S.ignoredSpells = {}
+
 S.HISTORY_SIZE = 200 -- detections kept across sessions for the History tab
 
 --- Records a detection for /rw report, the session list and the saved history.

@@ -85,7 +85,7 @@ describe("Detector", function()
         it("ignores commonly downranked spells", function() assert.is_nil(evaluate(205)) end)
 
         it("ignores spells the user allowed", function()
-            RW.db.profile.ignoredSpells[133] = true
+            RW.Session.ignoredSpells[133] = true
             assert.is_nil(evaluate(145))
         end)
 

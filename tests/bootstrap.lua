@@ -180,6 +180,7 @@ FakeFrame.methods = {
     CreateFontString = function(self) return _G.CreateFrame("FontString", nil, self) end,
     CreateTexture = function(self) return _G.CreateFrame("Texture", nil, self) end,
     GetEffectiveScale = function() return 1 end,
+    GetParent = function(self) return self.parent end,
     GetCenter = function() return 0, 0 end,
 }
 FakeFrame.__index = function(_, key)
@@ -242,6 +243,7 @@ function _G.__freshDB()
     RW.db = deepcopy(RW.DB_DEFAULTS)
     RW.db.ResetProfile = function(self) self.profile = deepcopy(RW.DB_DEFAULTS.profile) end
     RW.Session.Reset()
+    RW.Session.ignoredSpells = {}
     RW.Sync.peers = {}
     RW.Detector.ResetStats()
     RW.Detector.watch = false
