@@ -3,28 +3,30 @@
 -- Generates luacov.report.out after running: busted --coverage
 
 return {
-    -- Only report coverage for our own source files.
+    -- Only report coverage for our own top-level source files (anchored, so the
+    -- repo folder also being called RankWarden can't pull other files in).
     include = {
-        "Chat",
-        "Debug",
-        "Ranks",
-        "Messages",
-        "Session",
-        "Sync",
-        "Notify",
-        "Detector",
-        "SlashCommands",
-        "GUI",
-        "HUD",
-        "UI",
-        "RankWarden",
-        "RankWarden_Options",
+        "^Chat$",
+        "^Debug$",
+        "^Ranks$",
+        "^Messages$",
+        "^Session$",
+        "^Sync$",
+        "^Notify$",
+        "^Detector$",
+        "^SlashCommands$",
+        "^GUI$",
+        "^HUD$",
+        "^UI$",
+        "^RankWarden$",
+        "^RankWarden_Options$",
     },
 
     exclude = {
         "tests/.*",
         "Libs/.*",
-        "luacov",
+        "%.luarocks/.*", -- CI installs busted/luacov into the workspace
+        "^luacov$",
     },
 
     statsfile  = "luacov.stats.out",
