@@ -17,9 +17,21 @@ if (Test-Path $TempDir) { Remove-Item -Recurse -Force $TempDir }
 New-Item -ItemType Directory -Force -Path $StagingDir | Out-Null
 robocopy $Source $StagingDir /E /XD ".git" ".github" ".vscode" "tests" "tools" /XF "export.ps1" "run.ps1" ".luacheckrc" ".busted" ".luacov" ".stylua.toml" ".styluaignore" ".gitignore" ".pkgmeta" "luacov.stats.out" "luacov.report.out" | Out-Null
 
-# Zip the named folder so the archive contains RankWarden/ at the root
+# Zip the named folder so the archive contains RankWarden/ at the root.
+# Entries use forward slashes: Windows PowerShell 5.1's Compress-Archive writes
+# backslashes, which some extractors (and addon managers) mishandle.
 if (Test-Path $ZipPath) { Remove-Item -Force $ZipPath }
-Compress-Archive -Path $StagingDir -DestinationPath $ZipPath
+Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+$ZipPath = [System.IO.Path]::GetFullPath($ZipPath)
+$zip = [System.IO.Compression.ZipFile]::Open($ZipPath, [System.IO.Compression.ZipArchiveMode]::Create)
+try {
+    Get-ChildItem -Path $StagingDir -Recurse -File | ForEach-Object {
+        $relative = $_.FullName.Substring($TempDir.Length + 1) -replace '\\', '/'
+        [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $relative) | Out-Null
+    }
+} finally {
+    $zip.Dispose()
+}
 
 # Clean up
 Remove-Item -Recurse -Force $TempDir
