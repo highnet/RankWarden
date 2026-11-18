@@ -1,0 +1,17 @@
+package-as: RankWarden
+
+enable-nolib-creation: no
+
+ignore:
+  - tests
+  - tools
+  - .vscode
+  - run.ps1
+  - export.ps1
+  - .busted
+  - .luacov
+  - .luacheckrc
+  - .stylua.toml
+  - .styluaignore
+  - luacov.stats.out
+  - luacov.report.out

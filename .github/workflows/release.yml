@@ -1,0 +1,24 @@
+# Publishes to CurseForge (and a GitHub release) when a version tag is pushed:
+#   git tag v1.0.0 && git push origin v1.0.0
+# Needs repository secret CF_API_KEY and "## X-Curse-Project-ID" in RankWarden.toc.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Package and upload
+        uses: BigWigsMods/packager@v2
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,47 @@
+## Interface: 16001
+## Title: RankWarden
+## Notes: Spots group members casting outdated spell ranks and lets them know. Built for World of Warcraft: Forever.
+## Author: Sandy Klawz (EU PvE)
+## Version: 1.0.0
+## IconTexture: 136037
+## Category: Combat
+## SavedVariables: RankWardenDB
+## X-Credits: Ability data from RankSentinel (SabreValkyrn, MIT) and Gogo's revised ability list
+## X-Embeds: LibStub, CallbackHandler-1.0, AceAddon-3.0, AceEvent-3.0, AceConsole-3.0, AceComm-3.0, AceDB-3.0, AceGUI-3.0, AceConfig-3.0
+
+# ── Embedded Ace3 libraries ──────────────────────────────────────────────────
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\AceAddon-3.0\AceAddon-3.0.lua
+Libs\AceEvent-3.0\AceEvent-3.0.lua
+Libs\AceConsole-3.0\AceConsole-3.0.lua
+Libs\AceComm-3.0\AceComm-3.0.xml
+Libs\AceDB-3.0\AceDB-3.0.lua
+Libs\AceGUI-3.0\AceGUI-3.0.lua
+Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceConfig-3.0\AceConfig-3.0.lua
+Libs\AceConfig-3.0\AceConfigRegistry-3.0\AceConfigRegistry-3.0.lua
+Libs\AceConfig-3.0\AceConfigCmd-3.0\AceConfigCmd-3.0.lua
+Libs\AceConfig-3.0\AceConfigDialog-3.0\AceConfigDialog-3.0.lua
+
+# ── Addon source (order matters: each file depends on those above it) ────────
+# Core — must load first (creates the AceAddon object / global namespace)
+RankWarden.lua
+
+# Modules
+Debug.lua
+Chat.lua
+AbilityData.lua
+Ranks.lua
+Messages.lua
+Session.lua
+Sync.lua
+Notify.lua
+Detector.lua
+SlashCommands.lua
+UI.lua
+HUD.lua
+
+# GUI — options panel, main window and minimap button (depend on all modules above)
+RankWarden_Options.lua
+GUI.lua

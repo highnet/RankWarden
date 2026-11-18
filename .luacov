@@ -1,0 +1,30 @@
+-- .luacov
+-- luacov configuration for RankWarden.
+-- Generates luacov.report.out after running: busted --coverage
+
+return {
+    -- Only report coverage for our own source files.
+    include = {
+        "Chat",
+        "Debug",
+        "Ranks",
+        "Messages",
+        "Session",
+        "Sync",
+        "Notify",
+        "Detector",
+        "SlashCommands",
+        "GUI",
+        "HUD",
+        "UI",
+    },
+
+    exclude = {
+        "tests/.*",
+        "Libs/.*",
+        "luacov",
+    },
+
+    statsfile  = "luacov.stats.out",
+    reportfile = "luacov.report.out",
+}
