@@ -3,11 +3,29 @@
 A **World of Warcraft: Forever** addon that spots party and raid members casting an outdated spell rank, and lets them know.
 
 > **Game Version:** WoW: Forever — Interface 16001 (patch 1.60.x)
-> **Addon Version:** 1.1.0
+> **Addon Version:** 1.2.0
 > **SavedVariables:** `RankWardenDB`
 > **Author:** Sandy Klawz — EU PvE
 
 Inspired by [RankSentinel](https://www.curseforge.com/wow/addons/ranksentinel) (Classic / TBC), rebuilt for how Forever works.
+
+---
+
+## Where it works
+
+WoW: Forever restricts what addons can see and send. These are the limits measured with `/rw diag` on patch 1.60.1 (build 70959):
+
+| | Where it works | Where it doesn't |
+|---|---|---|
+| **Your own casts** | Everywhere | — |
+| **Group members' casts** | Only where Forever applies no addon restriction | Wherever the **Map** restriction is active, **including the open world**, plus encounters, keystone dungeons and PvP matches. Forever hides other players' casts from addons there, and every tracked spell is "contextually secret", so none are exempt. |
+| **Whispers** | Realms that allow addon chat | Realms that block addon chat. On these, addons can't send any chat messages, so notes stay in your own chat. |
+
+RankWarden tells you when you hit these limits:
+- **Restricted areas:** a chat warning once per area ("Group casts are hidden here (Map restriction): only your own spells can be checked") and an orange line at the top of the HUD.
+- **Blocked whispers:** the Whisper buttons show **Blocked** / **Can't whisper**, are disabled, and explain why on hover.
+
+`/rw diag` shows the current state, including your location and the restrictions active for each recent group cast. Paste it into an issue if you find somewhere that behaves differently.
 
 ---
 
@@ -78,7 +96,8 @@ Opens a plain-text report, already selected, so you can press **Ctrl+C** and pas
 - Client version, build and interface, plus RankWarden's settings and ignore counts.
 - Casts seen this session (yours, your group's, hidden), and **which addon restrictions were active** (Combat, Encounter, ChallengeMode, PvPMatch, Map, Chat) whenever a group member's cast was hidden or got through. This shows exactly when Forever hides other players' casts.
 - A **secrecy census**: how many tracked spells Forever marks `NeverSecret`, `AlwaysSecret` or `ContextuallySecret` as casts (`C_Secrets.GetSpellCastSecrecy`).
-- Addon chat state, group, lead, the last 10 detections and the last 25 group casts with their restrictions.
+- **Your location** (zone, sub-zone, map ID, open world or instance type), and whether group casts are known to be hidden here.
+- Addon chat state, group, lead, the last 10 detections, and the last 25 group casts with the restrictions active and where you were.
 
 **Reset counters** starts a fresh measurement; **Refresh** updates the report.
 

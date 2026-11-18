@@ -68,7 +68,13 @@ COMMANDS = {
             P("Detection: " .. OnOff(false))
         end,
     },
-    whisper = { desc = "Toggle whispering players (off = local chat only).", fn = Toggle("whisper", "Whispers") },
+    whisper = {
+        desc = "Toggle whispering players (off = local chat only).",
+        fn = function()
+            Toggle("whisper", "Whispers")()
+            if RW.db and RW.db.profile.whisper and not RW.UI.WhisperAllowed() then W(RW.UI.REALM_BLOCKED) end
+        end,
+    },
     maxlevel = { desc = "Toggle checking only max-level casters.", fn = Toggle("onlyMaxLevel", "Max-level only") },
     debug = { desc = "Toggle debug output (also re-alerts repeats).", fn = Toggle("debug", "Debug") },
 

@@ -4,6 +4,13 @@ New versions are published to CurseForge automatically when the version in
 `RankWarden.toc` is bumped on `main`; the matching section below becomes the
 release notes.
 
+## 1.2.0
+
+- **Warnings where it can't work.** Forever hides other players' casts wherever the Map restriction is active, which includes the open world, as well as encounters, keystone dungeons and PvP. RankWarden now warns in chat once per area ("Group casts are hidden here (Map restriction): only your own spells can be checked") and shows an orange line at the top of the HUD while you're there.
+- **Whisper buttons respect realm rules.** On realms that block addon chat, the Whisper and Whisper all buttons read Blocked / Can't whisper, are disabled, and explain why. Turning on `/rw whisper` there warns you too.
+- **Diagnostics show where you are:** zone, sub-zone, map ID, and open world or instance, now and for each recorded group cast.
+- README: a new "Where it works" section with the measured limits.
+
 ## 1.1.0
 
 - **Diagnostics report** (`/rw diag`, or the **Diagnostics** button in the main window): a plain-text report, pre-selected so **Ctrl+C** copies it. It shows when Forever hides other players' casts (counts of hidden and visible group casts by which addon restriction was active: Combat, Encounter, ChallengeMode, PvPMatch, Map, Chat), a secrecy census of tracked spells (never / always / contextually secret), client build, settings, addon chat state, recent detections and recent group casts. **Reset counters** starts a fresh measurement.

@@ -220,6 +220,8 @@ local function OnRowEnter(self)
         U.ShowSpellTooltip(self, row.rec, "ANCHOR_LEFT")
     elseif row.kind == "player" then
         U.ShowPlayerTooltip(self, row.player, "ANCHOR_LEFT")
+    elseif row.kind == "warning" then
+        Hint(self, RW.Diag.LimitText() .. " Forever hides other players' casts from addons in restricted areas.")
     end
 end
 
@@ -269,7 +271,12 @@ local function RowButton(f, i)
         end)
         w:SetScript("OnEnter", function(self)
             local row = self:GetParent().row
-            if row and row.player then Hint(self, "Whisper " .. row.player.name .. " about their lower ranks now.") end
+            if not (row and row.player) then return end
+            if U.WhisperAllowed() then
+                Hint(self, "Whisper " .. row.player.name .. " about their lower ranks now.")
+            else
+                Hint(self, U.REALM_BLOCKED)
+            end
         end)
         w:SetScript("OnLeave", U.HideTooltip)
         b.whisper = w
@@ -292,6 +299,10 @@ function H.Refresh()
         collapsed and "Interface\\Buttons\\UI-PlusButton-Up" or "Interface\\Buttons\\UI-MinusButton-Up"
     )
 
+    -- Where Forever hides group casts, say so on top (with the full reason on hover).
+    local why = RW.Diag and RW.Diag.HiddenHere()
+    if why then table.insert(rows, 1, { kind = "warning", text = U.Color("book", RW.Diag.LIMIT_SHORT:format(why)) }) end
+
     local shown = collapsed and 0 or #rows
     for i = 1, shown do
         local b = RowButton(f, i)
@@ -301,8 +312,9 @@ function H.Refresh()
         b.whisper:SetShown(canWhisper)
         -- Each player hears about each spell once per session: "Sent" once nothing is left to say.
         local unsent = canWhisper and U.HasUnsentWhisper(rows[i].player)
-        b.whisper:SetText(unsent and "Whisper" or "Sent")
-        b.whisper:SetEnabled(unsent and true or false)
+        local allowed = U.WhisperAllowed()
+        b.whisper:SetText(not allowed and "Blocked" or unsent and "Whisper" or "Sent")
+        b.whisper:SetEnabled((allowed and unsent) and true or false)
         b.text:SetPoint("RIGHT", canWhisper and -62 or -2, 0)
         b:Show()
     end

@@ -14,7 +14,13 @@ local D = RW.Diag
 D.RESTRICTIONS = { "Combat", "Encounter", "ChallengeMode", "PvPMatch", "Map", "Chat" }
 D.MAX_EVENTS = 25 -- recent hidden/visible casts kept for the report
 
+-- Restrictions that hide other players' casts on their own (seen in the field:
+-- Map alone hides them in Forever's open world). Combat alone is left out until proven.
+D.HIDING = { Map = true, Encounter = true, ChallengeMode = true, PvPMatch = true }
+D.warnedPlaces = {} -- place → true once the chat warning was shown (whole login session)
+
 function D.Reset()
+    D.hiddenPlaces = {} -- place → restriction key, wherever a group cast came back hidden
     D.hiddenBy = {} -- "Combat+Map" (or "none") → count of hidden casts
     D.visibleBy = {} -- same, for casts that got through
     D.events = {} -- recent { time, unit, hidden, restrictions }
@@ -40,12 +46,78 @@ end
 
 local function Key(active) return #active > 0 and table.concat(active, "+") or "none" end
 
+--- Where the player is: zone, sub-zone, map ID and instance type.
+function D.Location()
+    local zone = (GetRealZoneText and GetRealZoneText()) or (GetZoneText and GetZoneText()) or "?"
+    local sub = GetSubZoneText and GetSubZoneText() or ""
+    local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
+    local inInstance, instanceType = false, "none"
+    if IsInInstance then
+        inInstance, instanceType = IsInInstance()
+    end
+    return {
+        zone = zone ~= "" and zone or "?",
+        subzone = sub,
+        mapID = mapID,
+        instance = inInstance and (instanceType or "instance") or "open world",
+    }
+end
+
+--- One-line location, e.g. "Elwynn Forest / Goldshire (map 1429, open world)".
+function D.LocationText(loc)
+    loc = loc or D.Location()
+    local place = loc.subzone ~= "" and (loc.zone .. " / " .. loc.subzone) or loc.zone
+    return ("%s (map %s, %s)"):format(place, tostring(loc.mapID or "?"), loc.instance)
+end
+
 local function Remember(unit, hidden, active)
     local events = D.events
-    events[#events + 1] = { time = Now(), unit = unit, hidden = hidden, restrictions = Key(active) }
+    events[#events + 1] = {
+        time = Now(),
+        unit = unit,
+        hidden = hidden,
+        restrictions = Key(active),
+        where = D.LocationText(),
+    }
     while #events > D.MAX_EVENTS do
         table.remove(events, 1)
     end
+end
+
+--- Key for "here": map ID when known, else zone name.
+function D.Place()
+    local loc = D.Location()
+    return tostring(loc.mapID or loc.zone)
+end
+
+--- Why group casts are hidden where you are, or nil if they should be visible.
+function D.HiddenHere()
+    local hiding = {}
+    for _, name in ipairs(D.ActiveRestrictions()) do
+        if D.HIDING[name] then hiding[#hiding + 1] = name end
+    end
+    if #hiding > 0 then return Key(hiding) end
+    return D.hiddenPlaces[D.Place()]
+end
+
+D.LIMIT_TEXT = "Group casts are hidden here (%s restriction): only your own spells can be checked."
+D.LIMIT_SHORT = "Group casts hidden here (%s): only your spells are checked"
+
+--- Full warning for where you are, or nil.
+function D.LimitText()
+    local why = D.HiddenHere()
+    return why and D.LIMIT_TEXT:format(why) or nil
+end
+
+--- Warns in chat once per place per session, and refreshes the HUD's warning line.
+function D.CheckLocation()
+    local text = D.LimitText()
+    local place = D.Place()
+    if text and not D.warnedPlaces[place] then
+        D.warnedPlaces[place] = true
+        RW.Chat.Warn(text)
+    end
+    if RW.HUD and RW.HUD.Refresh then RW.HUD.Refresh() end
 end
 
 --- Called by the detector for every cast from another group member.
@@ -55,6 +127,10 @@ function D.OnCast(unit, hidden)
     local bucket = hidden and D.hiddenBy or D.visibleBy
     bucket[key] = (bucket[key] or 0) + 1
     Remember(unit, hidden, active)
+    if hidden then
+        D.hiddenPlaces[D.Place()] = key
+        D.CheckLocation()
+    end
 end
 
 --- How many tracked spells Forever marks never / always / contextually secret as casts.
@@ -126,6 +202,8 @@ function D.Report()
     add("Group casts hidden, by active restriction: %s", Sorted(D.hiddenBy))
     add("Group casts visible, by active restriction: %s", Sorted(D.visibleBy))
     add("Restrictions active now: %s", Key(D.ActiveRestrictions()))
+    add("Location now: %s", D.LocationText())
+    add("Group casts here: %s", D.HiddenHere() and ("hidden (" .. D.HiddenHere() .. ")") or "not known to be hidden")
     local blocked, reason = RW.Chat.ChatBlocked()
     add("Addon chat: %s", blocked and ("blocked (" .. reason .. ")") or "allowed")
     local counts, total = D.SecrecyCensus()
@@ -156,7 +234,14 @@ function D.Report()
     add("Recent group casts (oldest first):")
     if #D.events == 0 then add("  none yet") end
     for _, e in ipairs(D.events) do
-        add("  %s %s %s (restrictions: %s)", e.time, e.unit, e.hidden and "HIDDEN" or "visible", e.restrictions)
+        add(
+            "  %s %s %s (restrictions: %s) at %s",
+            e.time,
+            e.unit,
+            e.hidden and "HIDDEN" or "visible",
+            e.restrictions,
+            e.where
+        )
     end
     return table.concat(lines, "\n")
 end

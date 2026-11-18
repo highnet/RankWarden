@@ -4,7 +4,7 @@
 -- Target: World of Warcraft: Forever (interface 16001, WOW_PROJECT_ID 18).
 -- MUST be the first addon file in the TOC — all other modules reference RW.
 
-local ADDON_VERSION = "1.1.0"
+local ADDON_VERSION = "1.2.0"
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Addon object  (AceAddon calls OnInitialize / OnEnable automatically)
@@ -99,7 +99,10 @@ function RW:OnEnable()
     self:RegisterEvent("PLAYER_REGEN_ENABLED", flushSoon)
     self:RegisterEvent("PLAYER_ALIVE", flushSoon)
     self:RegisterEvent("PLAYER_UNGHOST", flushSoon)
-    self:RegisterEvent("ZONE_CHANGED_NEW_AREA", flushSoon) -- leaving a chat-restricted instance
+    self:RegisterEvent("ZONE_CHANGED_NEW_AREA", function()
+        flushSoon() -- leaving a chat-restricted instance
+        RW.Debug.SafeCall(RW.Diag.CheckLocation) -- warn if group casts are hidden here
+    end)
 
     -- Coordinate with other RankWarden users so only one of us whispers.
     self:RegisterComm(
@@ -110,6 +113,7 @@ function RW:OnEnable()
     self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
         RW.Sync.Hello()
         flushSoon()
+        RW.Debug.SafeCall(RW.Diag.CheckLocation)
     end)
 
     RW.Debug.Msg("Addon enabled — watching the combat log.")

@@ -128,9 +128,22 @@ local function RefreshAll()
 end
 U.RefreshAll = RefreshAll
 
+U.REALM_BLOCKED = "Your realm doesn't let addons send chat, so RankWarden can't whisper. Notes stay in your chat."
+
+--- False when this realm never lets addons send chat (whispers impossible).
+--- A temporary chat lockdown (dungeons, encounters) still counts as allowed: those whispers queue.
+function U.WhisperAllowed()
+    local blocked, reason = RW.Chat.ChatBlocked()
+    return not (blocked and reason == "realm")
+end
+
 --- Whisper one player about their lower ranks now (even with auto-whisper off).
 --- @return number whispers queued
 function U.WhisperPlayer(name)
+    if not U.WhisperAllowed() then
+        RW.Chat.Warn(U.REALM_BLOCKED)
+        return 0
+    end
     local profile = RW.db.profile
     local sent = 0
     for _, p in ipairs(U.GroupByPlayer(RW.Session.report)) do

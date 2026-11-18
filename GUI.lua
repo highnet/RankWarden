@@ -198,8 +198,10 @@ local function PlayerList(scroll, report)
         )
         if p.name ~= me then
             local unsent = U.HasUnsentWhisper(p)
-            local w = Button(head, unsent and "Whisper" or "Whispered", 0.22, function() U.WhisperPlayer(p.name) end)
-            w:SetDisabled(not unsent)
+            local allowed = U.WhisperAllowed()
+            local label = not allowed and "Can't whisper" or unsent and "Whisper" or "Whispered"
+            local w = Button(head, label, 0.22, function() U.WhisperPlayer(p.name) end)
+            w:SetDisabled(not (allowed and unsent))
             Button(head, "Ignore player", 0.22, function() U.IgnorePlayer(p.name, p.guid) end)
         end
         for _, rec in ipairs(p.entries) do
@@ -238,9 +240,12 @@ local DRAW = {}
 function DRAW.detections(container)
     local _, _, summary = U.Summary(U.GroupByPlayer(RW.Session.report))
 
+    if not U.WhisperAllowed() then Label(container, "|cffff9900" .. U.REALM_BLOCKED .. "|r") end
+
     local bar = Row(container)
     Label(bar, "|cffffd100" .. summary .. "|r", 0.4)
-    Button(bar, "Whisper all", 0.19, function() U.WhisperAll() end)
+    local all = Button(bar, "Whisper all", 0.19, function() U.WhisperAll() end)
+    all:SetDisabled(not U.WhisperAllowed())
     Button(bar, "Reset", 0.19, function() U.Reset() end)
     Button(bar, RW.HUD.IsShown() and "Hide HUD" or "Show HUD", 0.19, function()
         RW.HUD.Toggle()

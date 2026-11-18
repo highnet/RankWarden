@@ -204,3 +204,163 @@ describe("Diagnostics window", function()
         assert.is_not_nil(D.frame)
     end)
 end)
+
+describe("Location and hidden-area warning", function()
+    local function warnings()
+        local n = 0
+        for _, line in ipairs(W.printed) do
+            if line:find("Group casts are hidden here", 1, true) then n = n + 1 end
+        end
+        return n
+    end
+
+    before_each(function()
+        _G.__freshDB()
+        _G.__useFixture()
+        useRestrictionAPI()
+        D.warnedPlaces = {}
+        _G.GetRealZoneText = function() return "Elwynn Forest" end
+        _G.GetSubZoneText = function() return "Goldshire" end
+        _G.C_Map = { GetBestMapForUnit = function() return 1429 end }
+        _G.IsInInstance = function() return false, "none" end
+    end)
+
+    after_each(function()
+        clearRestrictionAPI()
+        _G.GetRealZoneText, _G.GetSubZoneText, _G.C_Map, _G.IsInInstance = nil, nil, nil, nil
+    end)
+
+    it("describes where you are", function()
+        assert.are.equal("Elwynn Forest / Goldshire (map 1429, open world)", D.LocationText())
+        _G.IsInInstance = function() return true, "party" end
+        _G.GetSubZoneText = function() return "" end
+        assert.are.equal("Elwynn Forest (map 1429, party)", D.LocationText())
+        _G.IsInInstance = function() return true, nil end
+        assert.are.equal("Elwynn Forest (map 1429, instance)", D.LocationText())
+    end)
+
+    it("falls back to GetZoneText and '?' on clients without those APIs", function()
+        _G.GetRealZoneText, _G.GetSubZoneText, _G.C_Map, _G.IsInInstance = nil, nil, nil, nil
+        _G.GetZoneText = function() return "" end
+        assert.are.equal("? (map ?, open world)", D.LocationText())
+        _G.GetZoneText = nil
+        assert.are.equal("? (map ?, open world)", D.LocationText())
+    end)
+
+    it("the report and each recorded cast include the location", function()
+        D.OnCast("party2", true)
+        local report = D.Report()
+        assert.is_truthy(report:find("Location now: Elwynn Forest / Goldshire (map 1429, open world)", 1, true))
+        assert.is_truthy(report:find("party2 HIDDEN (restrictions: none) at Elwynn Forest", 1, true))
+        assert.is_truthy(report:find("Group casts here: hidden (none)", 1, true))
+    end)
+
+    it("an active Map restriction alone means group casts are hidden here", function()
+        assert.is_nil(D.HiddenHere())
+        assert.is_truthy(D.Report():find("Group casts here: not known to be hidden", 1, true))
+        active.Combat = true
+        assert.is_nil(D.HiddenHere()) -- combat alone isn't proven to hide casts
+        active.Map = true
+        assert.are.equal("Map", D.HiddenHere())
+        assert.is_truthy(D.LimitText():find("(Map restriction)", 1, true))
+    end)
+
+    it("warns once per place when you arrive, and again in a new place", function()
+        active.Map = true
+        D.CheckLocation()
+        D.CheckLocation()
+        assert.are.equal(1, warnings())
+        _G.C_Map.GetBestMapForUnit = function() return 1433 end
+        D.CheckLocation()
+        assert.are.equal(2, warnings())
+    end)
+
+    it("a hidden cast proves the place is restricted, even with no restriction reported", function()
+        D.OnCast("party2", false)
+        assert.are.equal(0, warnings())
+        D.OnCast("party2", true)
+        assert.are.equal(1, warnings())
+        assert.are.equal("none", D.HiddenHere())
+    end)
+
+    it("the HUD shows a warning line on top while here, with an explanation on hover", function()
+        active.Map = true
+        RW.HUD.Show()
+        local first
+        for _, b in ipairs(RW.HUD.frame.rows) do
+            if b.shown then
+                first = b
+                break
+            end
+        end
+        assert.are.equal("warning", first.row.kind)
+        assert.is_truthy(first.text.text:find("Group casts hidden here (Map)", 1, true))
+        first.scripts.OnEnter(first)
+        first.scripts.OnClick(first, "LeftButton") -- does nothing
+    end)
+
+    it("zone changes and logging in check the location", function()
+        active.Map = true
+        RW:OnEnable()
+        W.events.ZONE_CHANGED_NEW_AREA()
+        assert.are.equal(1, warnings())
+        D.warnedPlaces = {}
+        W.events.PLAYER_ENTERING_WORLD()
+        assert.are.equal(2, warnings())
+    end)
+end)
+
+describe("Realm blocks addon chat", function()
+    local function find(kind, text)
+        for _, w in ipairs(W.widgets) do
+            if w.kind == kind then
+                local t = w.props.SetText or w.props.SetLabel or ""
+                if not text or tostring(t):find(text, 1, true) then return w end
+            end
+        end
+    end
+
+    before_each(function()
+        _G.__freshDB()
+        _G.__useFixture()
+        W.realmBlocked = true
+    end)
+
+    it("WhisperAllowed is false only for a realm-wide block, not a lockdown", function()
+        assert.is_false(RW.UI.WhisperAllowed())
+        W.realmBlocked = false
+        W.chatLockdown = true
+        assert.is_true(RW.UI.WhisperAllowed())
+    end)
+
+    it("the Whisper button refuses and explains instead of queuing", function()
+        RW.Detector.Evaluate(145, "Player-1-BUDDY", "Buddy", 40)
+        assert.are.equal(0, RW.UI.WhisperPlayer("Buddy"))
+        assert.are.equal(0, #RW.Session.queue)
+        assert.is_true(RW.UI.HasUnsentWhisper(RW.UI.GroupByPlayer(RW.Session.report)[1]))
+    end)
+
+    it("HUD Whisper buttons read Blocked, are disabled, and explain on hover", function()
+        RW.Detector.Evaluate(145, "Player-1-BUDDY", "Buddy", 40)
+        local row = RW.HUD.frame.rows[1]
+        assert.are.equal("Blocked", row.whisper.text)
+        row.whisper.scripts.OnEnter(row.whisper)
+    end)
+
+    it("the window disables whisper buttons and says why", function()
+        RW.Detector.Evaluate(145, "Player-1-BUDDY", "Buddy", 40)
+        RW.GUI.Open()
+        assert.is_not_nil(find("Label", "can't whisper"))
+        assert.is_true(find("Button", "Can't whisper").props.SetDisabled)
+        assert.is_true(find("Button", "Whisper all").props.SetDisabled)
+    end)
+
+    it("/rw whisper warns when turning auto-whisper on", function()
+        _G.SlashCmdList.RANKWARDEN("whisper")
+        local seen = false
+        for _, line in ipairs(W.printed) do
+            if line:find("can't whisper", 1, true) then seen = true end
+        end
+        assert.is_true(seen)
+    end)
+end)
