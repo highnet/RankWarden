@@ -5,6 +5,7 @@ enable-nolib-creation: no
 ignore:
   - tests
   - tools
+  - media
   - .vscode
   - run.ps1
   - export.ps1
