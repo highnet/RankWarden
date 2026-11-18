@@ -143,32 +143,28 @@ local function ReadCaster(unit)
 end
 
 -- Cast monitor (/rw watch): proves whether Forever delivers other players' casts.
+-- One line per player, repeated only when that changes (visible ↔ hidden), so it
+-- never spams chat.
 DT.stats = { own = 0, others = 0 }
+DT.watchState = {} -- player → true once announced
 
 function DT.ResetStats()
     DT.stats = { own = 0, others = 0 }
     DT.secretSkips = 0
+    DT.watchState = {}
 end
 
+local WATCH_LINE = "|cffffff00[watch]|r %s: |cff00ff00casts are reaching RankWarden|r"
+
+--- Announces, once per player, that their casts get through. Casts the game
+--- hides (encounters, instances, PvP) print nothing: they can't be checked anyway.
 local function Watch(unit, spellID)
-    if not RW.db.profile.watch or unit == "player" then return end
+    if not RW.db.profile.watch or unit == "player" or Secret(spellID) then return end
     local who = UnitName(unit)
-    if Secret(who) then who = "<hidden>" end
-    local what
-    if Secret(spellID) then
-        what = "|cffff4444spell hidden by the game|r"
-    else
-        local data = RW.Ranks.Lookup(spellID)
-        what = RW.Messages.SpellLink(spellID)
-            .. (
-                data
-                    and (" |cff00ff00tracked%s|r"):format(
-                        RW.Messages.HasRank(RW.Messages.SpellLink(spellID)) and "" or (", Rank " .. data.Rank)
-                    )
-                or " |cff888888untracked|r"
-            )
-    end
-    RW.Chat.Print(("|cffffff00[watch]|r %s %s: %s"):format(unit, tostring(who), what))
+    if Secret(who) or not who then who = unit end
+    if DT.watchState[who] then return end
+    DT.watchState[who] = true
+    RW.Chat.Print(WATCH_LINE:format(who))
 end
 
 --- UNIT_SPELLCAST_SUCCEEDED handler.

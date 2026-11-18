@@ -244,27 +244,49 @@ describe("Detector", function()
             assert.are.equal(1, DT.secretSkips)
         end)
 
-        it("cast monitor prints other players' casts, tracked or not", function()
+        local function watchLines()
+            local out = {}
+            for _, line in ipairs(W.printed) do
+                if line:find("[watch]", 1, true) then out[#out + 1] = line end
+            end
+            return out
+        end
+
+        it("cast monitor prints one line per player, not one per cast", function()
             RW.db.profile.watch = true
-            spellcast("player", 145)
+            spellcast("player", 145) -- your own casts are never printed
             spellcast("party1", 424242)
             spellcast("party1", 145)
-            spellcast("party1", W.SECRET)
-            local watchLines = {}
-            for _, line in ipairs(W.printed) do
-                if line:find("[watch]", 1, true) then watchLines[#watchLines + 1] = line end
-            end
-            assert.are.equal(3, #watchLines)
-            assert.is_truthy(watchLines[1]:find("untracked", 1, true))
-            assert.is_truthy(watchLines[2]:find("tracked, Rank 3", 1, true))
-            assert.is_truthy(watchLines[3]:find("hidden by the game", 1, true))
+            spellcast("party1", 133)
+            local lines = watchLines()
+            assert.are.equal(1, #lines)
+            assert.is_truthy(lines[1]:find("Buddy", 1, true))
+            assert.is_truthy(lines[1]:find("reaching RankWarden", 1, true))
         end)
 
-        it("cast monitor shows hidden names", function()
+        it("cast monitor prints nothing for casts the game hides", function()
+            RW.db.profile.watch = true
+            spellcast("party1", W.SECRET)
+            spellcast("party1", W.SECRET)
+            assert.are.equal(0, #watchLines())
+            spellcast("party1", 424242) -- once a cast gets through, it's announced once
+            spellcast("party1", W.SECRET)
+            local lines = watchLines()
+            assert.are.equal(1, #lines)
+            assert.is_truthy(lines[1]:find("reaching RankWarden", 1, true))
+        end)
+
+        it("cast monitor names hidden players by unit", function()
             RW.db.profile.watch = true
             W.units.party1.name = W.SECRET
             spellcast("party1", 424242)
-            assert.is_truthy(W.printed[#W.printed]:find("<hidden>", 1, true))
+            assert.is_truthy(W.printed[#W.printed]:find("party1", 1, true))
+        end)
+
+        it("cast monitor is silent when turned off", function()
+            RW.db.profile.watch = false
+            spellcast("party1", W.SECRET)
+            assert.are.equal(0, #watchLines())
         end)
 
         it("IsGroupUnit", function()
