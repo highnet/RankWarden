@@ -283,7 +283,7 @@ COMMANDS = {
     },
 
     watch = {
-        desc = "Toggle printing every cast from your group (to check other players are seen).",
+        desc = "Toggle the cast monitor: one line per group member once their casts get through.",
         fn = function()
             RW.db.profile.watch = not RW.db.profile.watch
             P(

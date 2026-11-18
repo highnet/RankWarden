@@ -168,7 +168,7 @@ local U = RW.UI
 local function Muted(text) return U.Color("muted", text) end
 
 local EMPTY_TITLE = "Nothing yet this session.\n\nLower ranks cast by you or your group show up here and in the HUD."
-local EMPTY_HINT = " Not seeing your group? Check the [watch] lines in chat (cast monitor) and ask someone to cast."
+local EMPTY_HINT = " Not seeing your group? Look for a [watch] line per player in chat, and ask someone to cast."
 local EMPTY_DETECTIONS = EMPTY_TITLE .. EMPTY_HINT
 
 --- Grouped-by-player list with per-player and per-spell actions.
@@ -265,7 +265,7 @@ function DRAW.detections(container)
     end
     local watch = AceGUI():Create("CheckBox")
     watch:SetLabel("Cast monitor")
-    watch:SetDescription("Print every cast from your group to chat, to check they're seen.")
+    watch:SetDescription("Print one line per group member once their casts reach RankWarden.")
     watch:SetValue(RW.db.profile.watch)
     watch:SetRelativeWidth(0.33)
     watch:SetCallback("OnValueChanged", function(_, _, v) RW.db.profile.watch = v end)

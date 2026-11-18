@@ -7,7 +7,7 @@ release notes.
 ## 1.0.2
 
 - **Rank shown once.** Forever's spell links already include the rank (`[Lightning Shield (Rank 3)]`), so RankWarden no longer adds a second "R3" / "(Rank 3)" in the HUD, the window, the history, `/rw report` or the whisper text. Plain links still get the rank added, in any client language.
-- Empty Detections tab now points to the cast monitor's `[watch]` lines (the monitor is on by default).
+- **Cast monitor no longer spams chat.** It prints one `[watch] <name>: casts are reaching RankWarden` line per group member, the first time their casts get through, instead of a line for every cast. Casts the game hides from addons (encounters, some instances, PvP) print nothing.
 - Documentation: the README is reorganised (Detection, Whispers, Ignoring, HUD, Main window) and covers per-player whispers and ignores, the once-per-session whisper rule, the cast monitor default, and automatic releases.
 - Tests now cover 100% of the addon's code, including start-up and the options panel, and CI enforces it.
 

@@ -20,7 +20,7 @@ Inspired by [RankSentinel](https://www.curseforge.com/wow/addons/ranksentinel) (
 - Gives players a few levels to reach their trainer before it says anything, and skips casts on much lower targets (deliberate downranks).
 - **Book, quest and drop ranks**: at max level, if a higher rank exists but trainers don't sell it, the player gets a heads-up that it comes from a book, quest or drop, and that they may not have it yet. Toggle with `/rw books`.
 - **Ignores commonly downranked spells** (heals, Power Word: Shield, Frostbolt, Earth Shock, Moonfire, Arcane Explosion, ...). Each one can be switched on or off.
-- **Cast monitor** (`/rw watch`, **on by default**) prints a `[watch]` line for every cast from your group, marked tracked, untracked or hidden by the game, so you can see that other players' casts reach the addon. Turn it off once you're happy.
+- **Cast monitor** (`/rw watch`, **on by default**) prints one `[watch] <name>: casts are reaching RankWarden` line per group member, the first time their casts get through, so you know they're being checked. Casts the game hides from addons (encounters, some instances, PvP) print nothing, since they can't be checked anyway.
 
 ### Whispers
 
@@ -103,7 +103,7 @@ Then restart the game.
 Whispers are **off** until you enable them. To try it:
 
 1. Cast a low rank of one of your own spells, e.g. Fireball Rank 1 at level 20+ (heals and Frostbolt are ignored by default). You'll see a local `You used ...` line, and the HUD pops open with your row. It has no Whisper button, because it's you.
-2. In a group, the cast monitor is already on: each cast from a group member prints a `[watch]` line marked tracked, untracked or hidden by the game. Their outdated casts appear in the HUD, each player with their own Whisper button.
+2. In a group, the cast monitor is already on: each group member gets one `[watch] <name>: casts are reaching RankWarden` line once their casts get through. Their outdated casts appear in the HUD, each player with their own Whisper button.
 3. `/rw status` shows the settings, how many rank chains were built, how many casts were seen (yours, your group's, hidden), and whether addon chat is allowed.
 4. Happy with it? Use a player's **Whisper** button, or run `/rw whisper` to auto-whisper. Turn the monitor off with `/rw watch` once you no longer need it.
 
@@ -115,7 +115,7 @@ Whispers are **off** until you enable them. To try it:
 | `/rw help` | List commands |
 | `/rw hud` | Toggle the lower-ranks HUD |
 | `/rw hudlock` / `/rw hudreset` | Lock the HUD in place / move it back to its default spot |
-| `/rw watch` | Toggle the cast monitor (prints every group cast; on by default, remembered) |
+| `/rw watch` | Toggle the cast monitor (one line per group member whose casts get through; on by default, remembered) |
 | `/rw books` | Toggle book/quest/drop rank notices |
 | `/rw minimap` | Show or hide the minimap button |
 | `/rw on` / `/rw off` | Enable / disable detection |
