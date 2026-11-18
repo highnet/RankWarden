@@ -2,7 +2,7 @@
 ## Title: RankWarden
 ## Notes: Spots group members casting outdated spell ranks and lets them know. Built for World of Warcraft: Forever.
 ## Author: Sandy Klawz (EU PvE)
-## Version: 1.0.1
+## Version: 1.0.2
 ## IconTexture: 136037
 ## Category: Combat
 ## SavedVariables: RankWardenDB

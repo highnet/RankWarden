@@ -83,20 +83,19 @@ function DT.Evaluate(spellID, guid, name, casterLevel, targetLevel, class)
 
     local link = RW.Messages.SpellLink(spellID)
     local fields = { spell = link, rank = data.Rank, level = nextLevel, name = name }
-    local ability = ("%s (Rank %d)"):format(link, data.Rank)
+    local ability = RW.Messages.WithRank(link, data.Rank)
     local isSelf = guid == UnitGUID("player")
 
     -- "Book" kinds: the next rank isn't sold by trainers, so it's a heads-up.
     local suffix = kind == "book" and "Book" or ""
     local entry = { target = name, isWhisper = false, ability = ability }
+    -- Auto-whisper only as the group's lead, and only once per player and spell per session.
+    local whisperKey = RW.Session.PlayerSpellKey(name, spellID)
+    local autoWhisper = profile.whisper and RW.Sync.IsLead() and not RW.Session.whisperedTo[whisperKey]
     if isSelf then
         entry.message = RW.Messages.Build("Self" .. suffix, fields, profile.flavor)
-    elseif
-        profile.whisper
-        and RW.Sync.IsLead()
-        and not RW.Session.whisperedTo[RW.Session.PlayerSpellKey(name, spellID)]
-    then
-        RW.Session.whisperedTo[RW.Session.PlayerSpellKey(name, spellID)] = true
+    elseif autoWhisper then
+        RW.Session.whisperedTo[whisperKey] = true
         entry.isWhisper = true
         entry.message = RW.Messages.Build("Whisper" .. suffix, fields, profile.flavor)
     else
@@ -161,7 +160,13 @@ local function Watch(unit, spellID)
     else
         local data = RW.Ranks.Lookup(spellID)
         what = RW.Messages.SpellLink(spellID)
-            .. (data and (" |cff00ff00tracked, Rank %d|r"):format(data.Rank) or " |cff888888untracked|r")
+            .. (
+                data
+                    and (" |cff00ff00tracked%s|r"):format(
+                        RW.Messages.HasRank(RW.Messages.SpellLink(spellID)) and "" or (", Rank " .. data.Rank)
+                    )
+                or " |cff888888untracked|r"
+            )
     end
     RW.Chat.Print(("|cffffff00[watch]|r %s %s: %s"):format(unit, tostring(who), what))
 end

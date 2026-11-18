@@ -154,9 +154,32 @@ local FakeAceGUI = {
 local FakeConfigDialog =
     { Open = function(_, app, container) W.configOpened = { app = app, container = container } end }
 
+-- Fake AceDB / AceConfig for OnInitialize and the options panel.
+local function copy(t)
+    if type(t) ~= "table" then return t end
+    local c = {}
+    for k, v in pairs(t) do
+        c[k] = copy(v)
+    end
+    return c
+end
+local FakeAceDB = {
+    New = function(_, name, defaults)
+        W.dbName = name
+        return { profile = copy(defaults.profile) }
+    end,
+}
+local FakeAceConfig = { RegisterOptionsTable = function(_, app, tbl) W.optionsTable = { app = app, table = tbl } end }
+FakeConfigDialog.AddToBlizOptions = function(_, app, name)
+    W.blizOptions = { app = app, name = name }
+    return {}, name
+end
+
 _G.LibStub = function(name)
     if name == "AceGUI-3.0" then return FakeAceGUI end
     if name == "AceConfigDialog-3.0" then return FakeConfigDialog end
+    if name == "AceDB-3.0" then return FakeAceDB end
+    if name == "AceConfig-3.0" then return FakeAceConfig end
     return { NewAddon = function() return {} end }
 end
 _G.UISpecialFrames = {}
@@ -207,6 +230,11 @@ function RW:SendCommMessage(prefix, msg, channel, target)
     table.insert(W.comms, { prefix = prefix, msg = msg, channel = channel, target = target })
 end
 
+-- AceEvent / AceComm stand-ins: remember handlers so tests can fire them.
+W.events, W.commHandlers = {}, {}
+function RW:RegisterEvent(event, fn) W.events[event] = fn end
+function RW:RegisterComm(prefix, fn) W.commHandlers[prefix] = fn end
+
 dofile("Debug.lua")
 dofile("Chat.lua")
 dofile("AbilityData.lua")
@@ -219,6 +247,7 @@ dofile("Detector.lua")
 dofile("SlashCommands.lua")
 dofile("UI.lua")
 dofile("HUD.lua")
+dofile("RankWarden_Options.lua")
 dofile("GUI.lua")
 
 -- Keep the real generated data around; fixtures replace it per test.

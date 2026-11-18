@@ -176,15 +176,17 @@ O.TABLE = {
             order = 100,
             type = "description",
             fontSize = "small",
-            name = "\n|cffffd100Created by Sandy Klawz — EU PvE|r  |cff888888(c) 2026 highnet, MIT|r\n\n"
-                .. "|cffffffffCredits|r\n"
-                .. "|cff888888• RankSentinel (MIT, (c) 2021 Gogo1951; maintained by SabreValkyrn / Valkyrn Studios): "
-                .. "the original idea and the curated low-rank ability list.\n"
-                .. "   RankSentinel thanks Gogo (data curation, Gogo's revised ability list), Aevala and Fathom "
-                .. "(ability data feedback) and Splendiferus (testing), and was inspired by RankWatch, "
-                .. "GogoWatch and SpellSnob.\n"
-                .. "• What's Training? by Sveng (MIT): Forever trainer spell data.\n"
-                .. "• Libraries: Ace3 (Ace3 Development Team), LibStub, CallbackHandler-1.0, ChatThrottleLib (Mikk).|r",
+            name = table.concat({
+                "\n|cffffd100Created by Sandy Klawz — EU PvE|r  |cff888888(c) 2026 highnet, MIT|r\n\n",
+                "|cffffffffCredits|r\n",
+                "|cff888888• RankSentinel (MIT, (c) 2021 Gogo1951; maintained by SabreValkyrn / Valkyrn Studios): ",
+                "the original idea and the curated low-rank ability list.\n",
+                "   RankSentinel thanks Gogo (data curation, Gogo's revised ability list), Aevala and Fathom ",
+                "(ability data feedback) and Splendiferus (testing), and was inspired by RankWatch, ",
+                "GogoWatch and SpellSnob.\n",
+                "• What's Training? by Sveng (MIT): Forever trainer spell data.\n",
+                "• Libraries: Ace3 (Ace3 Development Team), LibStub, CallbackHandler-1.0, ChatThrottleLib (Mikk).|r",
+            }),
         },
     },
 }

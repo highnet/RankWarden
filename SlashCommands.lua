@@ -181,7 +181,7 @@ COMMANDS = {
             local rows = RW.Session.report
             RW.Chat.Send(("RankWarden: %d outdated rank(s) this session."):format(#rows), channel)
             for _, r in ipairs(rows) do
-                RW.Chat.Send(("%s — %s (Rank %d)"):format(r.name, r.spell, r.rank), channel)
+                RW.Chat.Send(("%s — %s"):format(r.name, RW.Messages.WithRank(r.spell, r.rank)), channel)
             end
         end,
     },

@@ -50,6 +50,14 @@ function U.SpellIcon(spellID, size)
     return ("|T%s:%d:%d:0:0:64:64:5:59:5:59|t "):format(tostring(tex), size, size)
 end
 
+--- Spell link with its rank in the muted rank colour, unless the link already
+--- shows the rank (Forever's links do: "[Lightning Shield (Rank 3)]").
+function U.SpellWithRank(rec, short)
+    local spell = rec.spell or "?"
+    if RW.Messages.HasRank(spell) then return spell end
+    return spell .. " " .. U.Color("rank", (short and "R" or "Rank ") .. tostring(rec.rank or 0))
+end
+
 --- "next at 18" / "book/quest" / "".
 function U.NextText(rec, long)
     if rec.book then
@@ -137,7 +145,7 @@ function U.WhisperPlayer(name)
                     RW.Notify.Enqueue({
                         target = name,
                         isWhisper = true,
-                        ability = ("%s (Rank %d)"):format(tostring(rec.spell), rec.rank or 0),
+                        ability = RW.Messages.WithRank(tostring(rec.spell), rec.rank),
                         message = RW.Messages.Build(rec.book and "WhisperBook" or "Whisper", fields, profile.flavor),
                     })
                     sent = sent + 1

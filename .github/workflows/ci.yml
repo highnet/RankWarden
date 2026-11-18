@@ -31,3 +31,14 @@ jobs:
 
       - name: Test (busted + luacov)
         run: busted --coverage
+
+      - name: Coverage must stay at 100%
+        run: |
+          luacov
+          total=$(grep -E '^Total' luacov.report.out | awk '{print $NF}')
+          echo "Coverage: $total"
+          if [ "$total" != "100.00%" ]; then
+            awk '/^={10,}/{getline; f=$1; next} /^\*+0 /{print f": "$0}' luacov.report.out | head -20
+            echo "::error::Coverage is $total; every line of addon code must be covered."
+            exit 1
+          fi

@@ -31,12 +31,11 @@ function G.FormatRecord(rec)
     local U = RW.UI
     local how = rec.whispered and "|cff00ccffwhispered|r" or "|cff888888local|r"
     local nextText = U.NextText(rec, true)
-    return ("|cff888888%s|r  %s  %s%s %s  %s  %s"):format(
+    return ("|cff888888%s|r  %s  %s%s  %s  %s"):format(
         rec.time or "",
         U.ClassName(rec.name, rec.class),
         U.SpellIcon(rec.spellID),
-        rec.spell or "?",
-        U.Color("rank", "Rank " .. (rec.rank or 0)),
+        U.SpellWithRank(rec),
         nextText,
         how
     )
@@ -168,19 +167,15 @@ local U = RW.UI
 
 local function Muted(text) return U.Color("muted", text) end
 
+local EMPTY_TITLE = "Nothing yet this session.\n\nLower ranks cast by you or your group show up here and in the HUD."
+local EMPTY_HINT = " Not seeing your group? Check the [watch] lines in chat (cast monitor) and ask someone to cast."
+local EMPTY_DETECTIONS = EMPTY_TITLE .. EMPTY_HINT
+
 --- Grouped-by-player list with per-player and per-spell actions.
 local function PlayerList(scroll, report)
     local groups = U.GroupByPlayer(report)
     if #groups == 0 then
-        Label(
-            scroll,
-            Muted("Nothing yet this session.")
-                .. "\n\n"
-                .. Muted(
-                    "Lower ranks cast by you or your group show up here and in the HUD. "
-                        .. "Not seeing your group? Turn on the cast monitor below and ask someone to cast."
-                )
-        )
+        Label(scroll, Muted(EMPTY_DETECTIONS))
         return
     end
     local me = UnitName("player")
@@ -212,10 +207,9 @@ local function PlayerList(scroll, report)
             local new = U.IsNew(rec) and ("  " .. U.Color("new", "new")) or ""
             Label(
                 line,
-                ("      %s%s %s  %s%s"):format(
+                ("      %s%s  %s%s"):format(
                     U.SpellIcon(rec.spellID, 16),
-                    rec.spell or "?",
-                    U.Color("rank", "Rank " .. (rec.rank or 0)),
+                    U.SpellWithRank(rec),
                     U.NextText(rec, true),
                     new
                 ),

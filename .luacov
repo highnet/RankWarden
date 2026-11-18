@@ -17,6 +17,8 @@ return {
         "GUI",
         "HUD",
         "UI",
+        "RankWarden",
+        "RankWarden_Options",
     },
 
     exclude = {

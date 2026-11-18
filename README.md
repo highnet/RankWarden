@@ -3,7 +3,7 @@
 A **World of Warcraft: Forever** addon that spots party and raid members casting an outdated spell rank, and lets them know.
 
 > **Game Version:** WoW: Forever — Interface 16001 (patch 1.60.x)
-> **Addon Version:** 1.0.0
+> **Addon Version:** 1.0.2
 > **SavedVariables:** `RankWardenDB`
 > **Author:** Sandy Klawz — EU PvE
 
@@ -13,22 +13,63 @@ Inspired by [RankSentinel](https://www.curseforge.com/wow/addons/ranksentinel) (
 
 ## Features
 
+### Detection
+
 - Watches **you, your party and your raid** for low-rank casts.
 - Knows **Forever's own trainer data**, including Forever's new abilities and new ranks (1,493 trainable spells, 162 of them new in Forever).
-- **Local only by default.** Notifications appear only in your chat frame until you turn whispers on with `/rw whisper`.
-- **Ignores commonly downranked spells** (heals, Power Word: Shield, Frostbolt, Earth Shock, Moonfire, Arcane Explosion, ...). Each can be switched on or off, and you can ignore any other spell for the rest of your session with `/rw allow` (cleared when you log out or `/reload`).
-- Gives players a few levels to visit their trainer before it says anything. It never repeats itself, and it skips casts on much lower targets (deliberate downranks).
-- Whispers wait until neither of you is in combat. During Forever's chat lockdown in dungeons and raids they also wait until you leave.
-- When several group members run RankWarden, only one of them (the "lead") whispers.
+- Gives players a few levels to reach their trainer before it says anything, and skips casts on much lower targets (deliberate downranks).
 - **Book, quest and drop ranks**: at max level, if a higher rank exists but trainers don't sell it, the player gets a heads-up that it comes from a book, quest or drop, and that they may not have it yet. Toggle with `/rw books`.
-- **Window** (`/rw` toggles it) with tabs for this session's detections, saved history, ignored spells and players, and settings. Detections are grouped by player, with **Whisper**, **Ignore player** and **Ignore spell** buttons on each row. It also has **Whisper all**, **Reset**, a report-to-channel picker, and a remembered window size and position. There's also a **minimap button**: left-click toggles the window, right-click turns detection on or off, drag to move it.
-- **Lower-ranks HUD** (`/rw hud`): a small, movable panel listing this session's lower ranks, grouped by player.
-  - Player names are in class colours, with their level and count. Each spell has its icon, rank, and where the next rank comes from. Fresh detections are marked **new**.
-  - Each player row has its own **Whisper** button (a plain click never whispers). Right-click a player to ignore them. Hover a spell for its tooltip, shift-click to link it, or right-click to ignore it for this session.
-  - Footer button: **Reset**, which clears the list and forgets who was notified.
-  - It pops open on new detections (optional), collapses to its title bar, and can be locked and scaled. It remembers its position.
-- **Cast monitor** (`/rw watch`) prints every cast from your group, so you can check that other players' casts reach the addon.
-- Options panel under **Options → AddOns → RankWarden**.
+- **Ignores commonly downranked spells** (heals, Power Word: Shield, Frostbolt, Earth Shock, Moonfire, Arcane Explosion, ...). Each one can be switched on or off.
+- **Cast monitor** (`/rw watch`, **on by default**) prints a `[watch]` line for every cast from your group, marked tracked, untracked or hidden by the game, so you can see that other players' casts reach the addon. Turn it off once you're happy.
+
+### Whispers
+
+- **Local only by default.** Notifications appear only in your own chat frame until you turn auto-whisper on with `/rw whisper`, or whisper someone with their **Whisper** button.
+- **Each player is whispered about each spell at most once per login session**, whether automatically or with the button. Once everything listed for a player has been sent, their button greys out ("Sent" in the HUD, "Whispered" in the window). This survives the HUD's Reset.
+- Whispers wait until neither of you is in combat. During Forever's chat lockdown in dungeons and raids, they wait until you leave.
+- When several group members run RankWarden, only one of them (the "lead") auto-whispers.
+- You never get a Whisper button for yourself: your own lower ranks are just a local note to you.
+
+### Ignoring
+
+| What | How | How long |
+|---|---|---|
+| One spell for **one player** | Right-click the spell in the HUD, or **Ignore spell** in the window | This login session |
+| Every rank of a spell for **everyone** | `/rw allow <spell>` (shift-click it) | This login session |
+| A player | Right-click their name in the HUD, **Ignore player** in the window, or `/rw ignore` on your target | Saved |
+| Commonly downranked spells | `/rw downrank`, or the checkboxes under Ignored / Settings | Saved |
+
+Session ignores are cleared when you log out or `/reload`. You can see and remove all of them in `/rw` → **Ignored**.
+
+### Lower-ranks HUD (`/rw hud`)
+
+A small, movable panel listing this session's lower ranks, grouped by player:
+
+```
+Lower ranks 2                          [–] [≡] [x]
+Buddy (40)  2                        [ Whisper ]
+   [Fireball] R3  next at 18
+   [Lightning Shield (Rank 3)]  next at 32  new
+[Reset]                     1 player · 2 lower ranks
+```
+
+- Player names are in class colours, with their level and count. Each spell has its icon, its rank, and where the next rank comes from. Fresh detections are marked **new**.
+- Forever's spell links already name the rank (`[Lightning Shield (Rank 3)]`), so the rank is only added when a link doesn't show it. This applies to the HUD, the window, the report and the whisper text.
+- Each player row has its own **Whisper** button; a plain click on a row never whispers anyone. Right-click a player to ignore them. Hover a spell for its tooltip, shift-click it to link it in chat, or right-click it to ignore it for that player.
+- **Reset** clears the list and forgets who was notified, so new casts show again. Ignores and the once-per-session whisper rule stay.
+- It pops open on new detections (optional), collapses to its title bar, and can be locked and scaled. It remembers its position.
+
+### Main window (`/rw`)
+
+- **Detections** tab, grouped by player:
+  - **Whisper**, **Ignore player** and **Ignore spell** buttons on each row.
+  - **Whisper all** (each player still hears about each spell only once), **Reset**, and **Show/Hide HUD**.
+  - A report-to-channel picker, and the cast monitor checkbox.
+- **History** tab: the last 200 detections, kept between sessions.
+- **Ignored** tab: session spell ignores, per-player spell ignores, commonly downranked spells, and ignored players.
+- **Settings** tab: the full options panel, also under **Options → AddOns → RankWarden**.
+- The window remembers its size and position.
+- **Minimap button**: left-click toggles the window, right-click turns detection on or off, drag to move it.
 
 ### How it works on Forever
 
@@ -61,11 +102,10 @@ Then restart the game.
 
 Whispers are **off** until you enable them. To try it:
 
-1. Cast a low rank of one of your own spells, e.g. Fireball Rank 1 at level 20+ (heals and Frostbolt are ignored by default). You'll see a local `You used ...` line.
-2. In a group, other players' outdated casts show as local lines.
-3. To confirm other players are seen, run `/rw watch` and ask a group member to cast anything. Each cast prints a `[watch]` line marked tracked, untracked or hidden by the game.
-4. `/rw status` shows the settings, how many rank chains were built, any casts the game hid, and whether addon chat is allowed.
-5. Happy with it? Run `/rw whisper` to start whispering.
+1. Cast a low rank of one of your own spells, e.g. Fireball Rank 1 at level 20+ (heals and Frostbolt are ignored by default). You'll see a local `You used ...` line, and the HUD pops open with your row. It has no Whisper button, because it's you.
+2. In a group, the cast monitor is already on: each cast from a group member prints a `[watch]` line marked tracked, untracked or hidden by the game. Their outdated casts appear in the HUD, each player with their own Whisper button.
+3. `/rw status` shows the settings, how many rank chains were built, how many casts were seen (yours, your group's, hidden), and whether addon chat is allowed.
+4. Happy with it? Use a player's **Whisper** button, or run `/rw whisper` to auto-whisper. Turn the monitor off with `/rw watch` once you no longer need it.
 
 ## Commands
 
@@ -75,7 +115,7 @@ Whispers are **off** until you enable them. To try it:
 | `/rw help` | List commands |
 | `/rw hud` | Toggle the lower-ranks HUD |
 | `/rw hudlock` / `/rw hudreset` | Lock the HUD in place / move it back to its default spot |
-| `/rw watch` | Toggle the cast monitor (prints every group cast; on by default) |
+| `/rw watch` | Toggle the cast monitor (prints every group cast; on by default, remembered) |
 | `/rw books` | Toggle book/quest/drop rank notices |
 | `/rw minimap` | Show or hide the minimap button |
 | `/rw on` / `/rw off` | Enable / disable detection |
@@ -88,7 +128,7 @@ Whispers are **off** until you enable them. To try it:
 | `/rw queue [clear\|send]` | Show, clear or send queued whispers |
 | `/rw report [self\|say\|party\|raid\|guild]` | Report this session's detections |
 | `/rw status` | Settings, lead, caches, chat restrictions |
-| `/rw clear` | Forget who has already been notified |
+| `/rw clear` | Forget who has already been notified (like the HUD's Reset) |
 | `/rw reset` | Reset settings |
 | `/rw config` | Open the options panel |
 | `/rw debug` | Debug output (also re-alerts repeats) |
@@ -111,6 +151,8 @@ Tooling mirrors [RessurectionSayings](https://github.com/highnet/RessurectionSay
 
 VS Code tasks for each are in `.vscode/tasks.json`.
 
+CI (`.github/workflows/ci.yml`) runs the same checks on **Lua 5.1**, the Lua version WoW runs, on every push. Coverage is **100%** of the addon's own code (everything except the generated `AbilityData.lua` and the libraries in `Libs/`), and CI fails if it drops.
+
 Tools: `scoop install lua luarocks stylua`, then `luarocks install luacheck busted luacov`.
 
 ### Regenerating ability data
@@ -132,8 +174,8 @@ Re-run it when Forever patches change trainers.
 | `Chat.lua` | Local printing, sending, chat-restriction checks |
 | `AbilityData.lua` | Generated Forever trainer data |
 | `Ranks.lua` | Builds rank chains; rank and ignore logic |
-| `Messages.lua` | Notification wording |
-| `Session.lua` | Per-login state |
+| `Messages.lua` | Notification wording; shows a spell's rank once, even when the link already names it |
+| `Session.lua` | Per-login state: detections, queue, session and per-player ignores, who was whispered |
 | `Sync.lua` | Lead election between RankWarden users |
 | `Notify.lua` | Whisper queue |
 | `Detector.lua` | `UNIT_SPELLCAST_SUCCEEDED` → notification |
@@ -159,7 +201,9 @@ One-time setup: create a CurseForge API token (CurseForge → your account → A
 gh secret set CF_API_KEY --repo highnet/RankWarden
 ```
 
-`python tools/release.py` with `DRY_RUN=1` builds the zip locally without uploading.
+`python tools/release.py` with `DRY_RUN=1` builds the zip locally without uploading. The CurseForge game version comes from `CF_GAME_VERSION` in `release.yml` (currently `1.60.1`); change it when Forever's patch number changes.
+
+Version history is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## License
 

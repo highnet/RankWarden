@@ -31,13 +31,7 @@ H.GroupByPlayer = function(report) return U.GroupByPlayer(report) end
 --- Text of one spell row.
 function H.FormatEntry(rec)
     local new = U.IsNew(rec) and (" " .. U.Color("new", "new")) or ""
-    return ("%s%s %s  %s%s"):format(
-        U.SpellIcon(rec.spellID),
-        rec.spell or "?",
-        U.Color("rank", "R" .. tostring(rec.rank or 0)),
-        U.NextText(rec),
-        new
-    )
+    return ("%s%s  %s%s"):format(U.SpellIcon(rec.spellID), U.SpellWithRank(rec, true), U.NextText(rec), new)
 end
 
 --- Text of one player row.

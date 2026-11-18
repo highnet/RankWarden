@@ -283,3 +283,198 @@ describe("Version", function()
         assert.is_truthy(log:find("## " .. _G.RankWarden.VERSION, 1, true))
     end)
 end)
+
+describe("Duplicate rank (Forever links already name the rank)", function()
+    local M = RW.Messages
+    local FOREVER = "|cff71d5ff|Hspell:8134:0|h[Lightning Shield (Rank 3)]|h|r"
+
+    before_each(function()
+        _G.__freshDB()
+        _G.__useFixture()
+    end)
+
+    it("HasRank spots ranked links in any language, not plain ones", function()
+        assert.is_true(M.HasRank(FOREVER))
+        assert.is_true(M.HasRank("[Blitzschlagschild (Rang 3)]"))
+        assert.is_true(M.HasRank("Lightning Shield (Rank 3)"))
+        assert.is_false(M.HasRank("[Fireball]"))
+        assert.is_false(M.HasRank("[Fireball (Arcane)]"))
+        assert.is_false(M.HasRank(nil))
+    end)
+
+    it("WithRank only adds the rank when the link lacks it", function()
+        assert.are.equal(FOREVER, M.WithRank(FOREVER, 3))
+        assert.are.equal("[Fireball] (Rank 3)", M.WithRank("[Fireball]", 3))
+        assert.are.equal("[Fireball] R3", M.WithRank("[Fireball]", 3, true))
+        assert.are.equal("[Fireball]", M.WithRank("[Fireball]", nil))
+    end)
+
+    it("messages never repeat the rank", function()
+        for _, flavor in ipairs(M.FlavorNames()) do
+            for _, kind in ipairs({ "Whisper", "Local", "Self", "WhisperBook", "LocalBook", "SelfBook" }) do
+                local msg = M.Build(kind, { spell = FOREVER, rank = 3, level = 32, name = "Zed" }, flavor)
+                local _, ranks = msg:gsub("Rank 3", "")
+                assert.is_true(ranks <= 1, flavor .. "/" .. kind .. ": " .. msg)
+                assert.is_falsy(msg:find("R3", 1, true), flavor .. "/" .. kind .. ": " .. msg)
+                assert.is_falsy(msg:find("{", 1, true) and msg:find("{spell", 1, true))
+            end
+        end
+    end)
+
+    it("HUD, window rows and history show the rank once", function()
+        local rec = { name = "Sandy", spell = FOREVER, rank = 3, nextLevel = 32 }
+        local hud = RW.HUD.FormatEntry(rec)
+        assert.is_falsy(hud:find("R3", 1, true))
+        assert.is_truthy(hud:find("Rank 3)", 1, true))
+        local window = RW.GUI.FormatRecord(rec)
+        local _, count = window:gsub("Rank 3", "")
+        assert.are.equal(1, count)
+        -- plain links still get the rank added
+        assert.is_truthy(RW.HUD.FormatEntry({ spell = "[Fireball]", rank = 3 }):find("R3", 1, true))
+    end)
+
+    it("report lines and whisper entries show the rank once", function()
+        local real = _G.C_Spell.GetSpellLink
+        _G.C_Spell.GetSpellLink = function() return FOREVER end
+        local e = RW.Detector.Evaluate(145, "Player-1-BUDDY", "Buddy", 40)
+        _G.C_Spell.GetSpellLink = real
+        assert.are.equal(FOREVER, e.ability)
+        local _, count = e.message:gsub("Rank 3", "")
+        assert.are.equal(1, count)
+        _G.SlashCmdList.RANKWARDEN("report party")
+        local _, n = __W.sent[#__W.sent].msg:gsub("Rank 3", "")
+        assert.are.equal(1, n)
+    end)
+end)
+
+describe("API fallbacks and edge cases", function()
+    before_each(function()
+        _G.__freshDB()
+        _G.__useFixture()
+    end)
+
+    it("SpellLink uses the old global on clients without C_Spell.GetSpellLink", function()
+        local real = _G.C_Spell.GetSpellLink
+        _G.C_Spell.GetSpellLink = nil
+        _G.GetSpellLink = function(id) return "[old" .. id .. "]" end
+        assert.are.equal("[old5]", RW.Messages.SpellLink(5))
+        _G.GetSpellLink = nil
+        _G.C_Spell.GetSpellLink = real
+    end)
+
+    it("FlushSoon waits with C_Timer when it exists", function()
+        local delayed
+        _G.C_Timer = {
+            After = function(seconds, fn)
+                delayed = seconds
+                fn()
+            end,
+        }
+        RW.db.profile.whisper = true
+        __W.inCombat = true
+        RW.Detector.Evaluate(145, "Player-1-BUDDY", "Buddy", 40)
+        __W.inCombat = false
+        RW.Notify.FlushSoon()
+        _G.C_Timer = nil
+        assert.are.equal(RW.Notify.FLUSH_DELAY, delayed)
+        assert.are.equal(1, #__W.sent)
+    end)
+
+    it("SpellName reads C_Spell.GetSpellInfo and requests unloaded spells", function()
+        local requested
+        _G.C_Spell.GetSpellInfo = function(id) return id == 1 and { name = "Blink" } or nil end
+        _G.C_Spell.RequestLoadSpellData = function(id) requested = id end
+        assert.are.equal("Blink", RW.Ranks.SpellName(1))
+        assert.is_nil(RW.Ranks.SpellName(2))
+        assert.are.equal(2, requested)
+        _G.C_Spell.GetSpellInfo, _G.C_Spell.RequestLoadSpellData = nil, nil
+    end)
+
+    it("SpellName falls back to the old global, then to nil", function()
+        _G.GetSpellInfo = function() return "Old Blink" end
+        assert.are.equal("Old Blink", RW.Ranks.SpellName(1))
+        _G.GetSpellInfo = nil
+        assert.is_nil(RW.Ranks.SpellName(1))
+    end)
+
+    it("SpellRank reads the rank text from C_Spell or the old global", function()
+        _G.C_Spell.GetSpellSubtext = function() return "Rank 4" end
+        assert.are.equal(4, RW.Ranks.SpellRank(1))
+        _G.C_Spell.GetSpellSubtext = nil
+        _G.GetSpellSubtext = function() return "Rang 2" end
+        assert.are.equal(2, RW.Ranks.SpellRank(1))
+        _G.GetSpellSubtext = function() return "Racial" end
+        assert.is_nil(RW.Ranks.SpellRank(1))
+        _G.GetSpellSubtext = nil
+        assert.is_nil(RW.Ranks.SpellRank(1))
+    end)
+
+    it("ranks with the same trainer level are ordered by spell ID", function()
+        RW.TrainerSpells = { MAGE = { [20] = 10, [10] = 10 } }
+        RW.ExplicitGroups, RW.LegacyRanked, RW.LegacyExcluded = {}, {}, {}
+        RW.Ranks.Build(function() return "Blink" end, function() return nil end)
+        assert.are.equal(1, RW.AbilityData[10].Rank)
+        assert.are.equal(2, RW.AbilityData[20].Rank)
+    end)
+
+    it("slash commands wait until the database is ready", function()
+        local db = RW.db
+        RW.db = nil
+        _G.SlashCmdList.RANKWARDEN("on")
+        RW.db = db
+        local seen = false
+        for _, line in ipairs(__W.printed) do
+            if line:find("not fully loaded", 1, true) then seen = true end
+        end
+        assert.is_true(seen)
+    end)
+
+    it("/rw allow lists session ignores by name", function()
+        RW.Session.ignoredSpells[145] = true
+        _G.SlashCmdList.RANKWARDEN("allow")
+        local listed = false
+        for _, line in ipairs(__W.printed) do
+            if line:find("(145)", 1, true) then listed = true end
+        end
+        assert.is_true(listed)
+    end)
+
+    it("/rw config opens the options panel", function()
+        local opened = false
+        local real = RW.Options
+        RW.Options = { Open = function() opened = true end }
+        _G.SlashCmdList.RANKWARDEN("config")
+        RW.Options = real
+        assert.is_true(opened)
+    end)
+
+    it("plain /rw shows help when the window isn't available", function()
+        local real = RW.GUI.Toggle
+        RW.GUI.Toggle = nil
+        _G.SlashCmdList.RANKWARDEN("")
+        RW.GUI.Toggle = real
+        local seen = false
+        for _, line in ipairs(__W.printed) do
+            if line:find("commands", 1, true) then seen = true end
+        end
+        assert.is_true(seen)
+    end)
+
+    it("spell tooltips work without a spell ID, and hide cleanly", function()
+        local lines = {}
+        local tip = _G.GameTooltip
+        _G.GameTooltip = setmetatable({ AddLine = function(_, t) lines[#lines + 1] = t end }, {
+            __index = function()
+                return function() end
+            end,
+        })
+        RW.UI.ShowSpellTooltip({}, { spell = "[Fireball]", rank = 2 })
+        RW.UI.HideTooltip()
+        _G.GameTooltip = nil
+        RW.UI.ShowSpellTooltip({}, { spell = "[Fireball]" })
+        RW.UI.ShowPlayerTooltip({}, { name = "A", entries = {} })
+        RW.UI.HideTooltip()
+        _G.GameTooltip = tip
+        assert.are.equal("[Fireball]", lines[1])
+    end)
+end)
