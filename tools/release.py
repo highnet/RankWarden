@@ -33,7 +33,7 @@ API = "https://wow.curseforge.com/api"
 EXCLUDE_DIRS = (".github/", ".vscode/", "tests/", "tools/", "media/", "dist/")
 EXCLUDE_FILES = {
     "export.ps1", "run.ps1", ".luacheckrc", ".busted", ".luacov", ".stylua.toml",
-    ".styluaignore", ".gitignore", ".pkgmeta", "CHANGELOG.md",
+    ".styluaignore", ".gitignore", ".pkgmeta", "CHANGELOG.md", "CONTRIBUTING.md",
 }
 
 

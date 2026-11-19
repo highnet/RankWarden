@@ -1,9 +1,5 @@
 # Changelog
 
-New versions are published to CurseForge automatically when the version in
-`RankWarden.toc` is bumped on `main`; the matching section below becomes the
-release notes.
-
 ## 1.3.0
 
 - **Everything on by default.** Auto-whisper and showing the HUD at login are now on out of the box (Max level only and Debug stay off, since they limit or clutter checking). If you changed a setting yourself, your choice is kept.
