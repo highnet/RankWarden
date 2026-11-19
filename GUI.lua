@@ -18,7 +18,7 @@ G.TABS = {
 }
 G.currentTab = "detections"
 G.MINIMAP_RADIUS = 80
-G.ICON = 136037
+G.ICON = "Interface\\AddOns\\RankWarden\\Textures\\icon" -- dragon eye (tools/make_logo.py)
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Pure helpers

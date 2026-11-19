@@ -356,6 +356,7 @@ describe("Realm blocks addon chat", function()
     end)
 
     it("/rw whisper warns when turning auto-whisper on", function()
+        RW.db.profile.whisper = false -- auto-whisper is on by default
         _G.SlashCmdList.RANKWARDEN("whisper")
         local seen = false
         for _, line in ipairs(W.printed) do

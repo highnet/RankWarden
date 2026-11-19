@@ -1,9 +1,11 @@
 # RankWarden
 
-A **World of Warcraft: Forever** addon that spots party and raid members casting an outdated spell rank, and lets them know.
+A **RankSentinel-style rank checker for World of Warcraft: Forever**: it spots party and raid members casting an outdated spell rank, and lets them know.
+
+<img src="media/logo.png" alt="RankWarden dragon-eye logo" width="128">
 
 > **Game Version:** WoW: Forever — Interface 16001 (patch 1.60.x)
-> **Addon Version:** 1.2.0
+> **Addon Version:** 1.3.0
 > **SavedVariables:** `RankWardenDB`
 > **Author:** Sandy Klawz — EU PvE
 
@@ -42,7 +44,7 @@ RankWarden tells you when you hit these limits:
 
 ### Whispers
 
-- **Local only by default.** Notifications appear only in your own chat frame until you turn auto-whisper on with `/rw whisper`, or whisper someone with their **Whisper** button.
+- **Auto-whisper is on by default** (turn it off with `/rw whisper` to keep notes in your own chat). You can also whisper someone with their **Whisper** button.
 - **Each player is whispered about each spell at most once per login session**, whether automatically or with the button. Once everything listed for a player has been sent, their button greys out ("Sent" in the HUD, "Whispered" in the window). This survives the HUD's Reset.
 - Whispers wait until neither of you is in combat. During Forever's chat lockdown in dungeons and raids, they wait until you leave.
 - When several group members run RankWarden, only one of them (the "lead") auto-whispers.
@@ -130,12 +132,12 @@ Then restart the game.
 
 ## Testing it safely
 
-Whispers are **off** until you enable them. To try it:
+Auto-whisper is **on** by default. To try RankWarden without messaging anyone, run `/rw whisper` first to turn it off; notes then stay in your own chat. Then:
 
 1. Cast a low rank of one of your own spells, e.g. Fireball Rank 1 at level 20+ (heals and Frostbolt are ignored by default). You'll see a local `You used ...` line, and the HUD pops open with your row. It has no Whisper button, because it's you.
 2. In a group, the cast monitor is already on: each group member gets one `[watch] <name>: casts are reaching RankWarden` line once their casts get through. Their outdated casts appear in the HUD, each player with their own Whisper button.
 3. `/rw status` shows the settings, how many rank chains were built, how many casts were seen (yours, your group's, hidden), and whether addon chat is allowed.
-4. Happy with it? Use a player's **Whisper** button, or run `/rw whisper` to auto-whisper. Turn the monitor off with `/rw watch` once you no longer need it.
+4. Happy with it? Run `/rw whisper` again to turn auto-whisper back on, or whisper people one at a time with their **Whisper** button. Turn the monitor off with `/rw watch` once you no longer need it.
 
 ## Commands
 

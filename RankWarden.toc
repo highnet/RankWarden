@@ -1,9 +1,9 @@
 ## Interface: 16001
 ## Title: RankWarden
-## Notes: Spots group members casting outdated spell ranks and lets them know. Built for World of Warcraft: Forever.
+## Notes: A RankSentinel-style rank checker for WoW: Forever. Spots group members casting outdated spell ranks and lets them know.
 ## Author: Sandy Klawz (EU PvE)
-## Version: 1.2.0
-## IconTexture: 136037
+## Version: 1.3.0
+## IconTexture: Interface\AddOns\RankWarden\Textures\icon
 ## Category: Combat
 ## SavedVariables: RankWardenDB
 ## X-Curse-Project-ID: 1815098

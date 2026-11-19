@@ -193,8 +193,9 @@ describe("SlashCommands", function()
     end)
 
     it("whisper, maxlevel, debug and downrank toggle", function()
+        assert.is_true(RW.db.profile.whisper) -- on by default
         run("whisper")
-        assert.is_true(RW.db.profile.whisper)
+        assert.is_false(RW.db.profile.whisper)
         run("maxlevel")
         assert.is_true(RW.db.profile.onlyMaxLevel)
         run("debug")
@@ -252,6 +253,7 @@ describe("SlashCommands", function()
     end)
 
     it("report goes to the chosen channel", function()
+        RW.db.profile.whisper = false -- auto-whisper is on by default
         RW.Detector.Evaluate(145, "Player-1-BUDDY", "Buddy", 40)
         run("report party")
         assert.are.equal("PARTY", W.sent[1].ch)

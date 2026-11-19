@@ -4,7 +4,7 @@
 -- Target: World of Warcraft: Forever (interface 16001, WOW_PROJECT_ID 18).
 -- MUST be the first addon file in the TOC — all other modules reference RW.
 
-local ADDON_VERSION = "1.2.0"
+local ADDON_VERSION = "1.3.0"
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Addon object  (AceAddon calls OnInitialize / OnEnable automatically)
@@ -23,13 +23,13 @@ RW.NAME = "RankWarden"
 RW.DB_DEFAULTS = {
     profile = {
         enabled = true,
-        whisper = false, -- whisper group members (off by default: local chat only)
+        whisper = true, -- auto-whisper group members (once per player and spell per session)
         onlyMaxLevel = false, -- only check casters at max level
         flavor = "default", -- notification wording, see Messages.lua
         debug = false,
         announced = {}, -- "guid-level-spellID" → true  (never repeat)
         ignored = {}, -- guid → name
-        watch = true, -- cast monitor: print every group member's cast to chat
+        watch = true, -- cast monitor: one chat line per group member whose casts get through
         bookRanks = true, -- at max level, mention ranks trainers don't sell (books, quests, drops)
         ignoreCommonDownranks = true, -- skip heals & other spells people downrank on purpose
         commonDownranks = {}, -- rank-1 spellID → false to stop ignoring that one
@@ -38,7 +38,7 @@ RW.DB_DEFAULTS = {
         hud = {
             autoOpen = true,
             locked = false,
-            shown = false,
+            shown = true, -- the HUD is visible from the first login
             collapsed = false,
             scale = 1,
             point = { "RIGHT", "RIGHT", -60, 120 },

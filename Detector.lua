@@ -91,7 +91,8 @@ function DT.Evaluate(spellID, guid, name, casterLevel, targetLevel, class)
     local entry = { target = name, isWhisper = false, ability = ability }
     -- Auto-whisper only as the group's lead, and only once per player and spell per session.
     local whisperKey = RW.Session.PlayerSpellKey(name, spellID)
-    local autoWhisper = profile.whisper and RW.Sync.IsLead() and not RW.Session.whisperedTo[whisperKey]
+    local autoWhisper = profile.whisper and RW.UI.WhisperAllowed() -- impossible on chat-blocked realms
+    autoWhisper = autoWhisper and RW.Sync.IsLead() and not RW.Session.whisperedTo[whisperKey]
     if isSelf then
         entry.message = RW.Messages.Build("Self" .. suffix, fields, profile.flavor)
     elseif autoWhisper then

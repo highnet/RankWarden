@@ -38,6 +38,7 @@ describe("GUI helpers", function()
     end)
 
     it("StatusText reflects settings and chat state", function()
+        RW.db.profile.whisper = false -- auto-whisper is on by default
         assert.is_truthy(G.StatusText():find("local only", 1, true))
         RW.db.profile.whisper = true
         W.chatLockdown = true
@@ -155,6 +156,7 @@ describe("GUI window", function()
     end)
 
     it("report goes to the chosen channel", function()
+        RW.db.profile.whisper = false -- auto-whisper is on by default
         detect()
         G.Open()
         click("Report")

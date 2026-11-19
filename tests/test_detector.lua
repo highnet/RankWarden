@@ -29,12 +29,25 @@ describe("Detector", function()
     end)
 
     describe("Evaluate", function()
-        it("prints locally (no whisper) by default", function()
+        it("prints locally when auto-whisper is off", function()
+            RW.db.profile.whisper = false -- auto-whisper is on by default
             local e = evaluate(145)
             assert.is_table(e)
             assert.is_false(e.isWhisper)
             assert.are.equal(0, #W.sent)
             assert.is_truthy(W.printed[#W.printed]:find("Buddy"))
+        end)
+
+        it("auto-whispers by default", function()
+            assert.is_true(RW.db.profile.whisper)
+            assert.is_true(evaluate(145).isWhisper)
+        end)
+
+        it("never marks a player whispered when the realm blocks addon chat", function()
+            W.realmBlocked = true
+            local e = evaluate(145)
+            assert.is_false(e.isWhisper)
+            assert.is_nil(RW.Session.whisperedTo[RW.Session.PlayerSpellKey("Buddy", 145)])
         end)
 
         it("whispers when enabled and we are lead", function()
@@ -329,10 +342,13 @@ describe("Detector", function()
             assert.are.equal(1, #W.sent)
         end)
 
-        it("falls back to local chat when the realm blocks addon chat", function()
+        it("falls back to local chat if the realm starts blocking addon chat after queuing", function()
             RW.db.profile.whisper = true
+            W.inCombat = true
+            evaluate(145) -- queued while in combat
+            W.inCombat = false
             W.realmBlocked = true
-            evaluate(145)
+            RW.Notify.Flush()
             assert.are.equal(0, #W.sent)
             assert.are.equal(0, #RW.Session.queue)
             local seen = false

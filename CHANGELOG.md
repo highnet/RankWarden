@@ -4,6 +4,13 @@ New versions are published to CurseForge automatically when the version in
 `RankWarden.toc` is bumped on `main`; the matching section below becomes the
 release notes.
 
+## 1.3.0
+
+- **Everything on by default.** Auto-whisper and showing the HUD at login are now on out of the box (Max level only and Debug stay off, since they limit or clutter checking). If you changed a setting yourself, your choice is kept.
+- **Fix:** on realms that block addon chat, auto-whisper no longer marks players as "already whispered" when nothing could be sent.
+- **New dragon-eye icon** for the addon list, minimap button and HUD (shipped as `Textures/icon.tga`), and a matching CurseForge logo.
+- Described as a RankSentinel-style rank checker, so it's easier to find for RankSentinel users.
+
 ## 1.2.0
 
 - **Warnings where it can't work.** Forever hides other players' casts wherever the Map restriction is active, which includes the open world, as well as encounters, keystone dungeons and PvP. RankWarden now warns in chat once per area ("Group casts are hidden here (Map restriction): only your own spells can be checked") and shows an orange line at the top of the HUD while you're there.

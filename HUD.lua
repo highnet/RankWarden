@@ -162,7 +162,7 @@ function H.Create()
     local icon = f:CreateTexture(nil, "ARTWORK")
     icon:SetSize(16, 16)
     icon:SetPoint("TOPLEFT", H.PADDING + 2, -H.PADDING - 1)
-    icon:SetTexture(RW.GUI and RW.GUI.ICON or 136037)
+    icon:SetTexture(RW.GUI.ICON)
 
     local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     title:SetPoint("LEFT", icon, "RIGHT", 6, 0)

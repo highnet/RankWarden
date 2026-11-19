@@ -148,6 +148,7 @@ describe("HUD frame", function()
     end)
 
     it("player row: its own Whisper button whispers that player only", function()
+        RW.db.profile.whisper = false -- auto-whisper is on by default
         detectBuddy()
         RW.Detector.Evaluate(145, "Player-1-ZED", "Zed", 40)
         local rows = visibleRows()
@@ -166,6 +167,7 @@ describe("HUD frame", function()
     end)
 
     it("player row: a plain click never whispers; right-click ignores", function()
+        RW.db.profile.whisper = false -- auto-whisper is on by default
         detectBuddy()
         local playerRow = visibleRows()[1]
         playerRow.scripts.OnClick(playerRow, "LeftButton")
@@ -185,6 +187,7 @@ describe("HUD frame", function()
     end)
 
     it("Whisper button does nothing without a player row", function()
+        RW.db.profile.whisper = false -- auto-whisper is on by default
         detectBuddy()
         local b = visibleRows()[1]
         b.row = false -- fake frames return stubs for missing keys
@@ -243,6 +246,8 @@ describe("HUD frame", function()
     end)
 
     it("restores after login only if it was open", function()
+        assert.is_true(RW.db.profile.hud.shown) -- shown by default
+        RW.db.profile.hud.shown = false
         H.Restore()
         assert.is_nil(H.frame)
         RW.db.profile.hud.shown = true
